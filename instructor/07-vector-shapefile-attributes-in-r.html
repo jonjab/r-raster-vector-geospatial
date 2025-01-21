@@ -871,7 +871,8 @@ differently.
 colors for each line based on a default color order. If we don’t like
 those default colors, we can create a vector of colors - one for each
 feature.</p>
-<p>First we will check how many unique levels our factor has:</p>
+<p>First we will check how many unique values our TYPE attribute
+has:</p>
 <div class="codewrapper sourceCode" id="cb32">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
@@ -909,8 +910,8 @@ Roads and trails in the area.
 </figcaption></figure><div class="section level3">
 <h3 id="adjust-line-width">Adjust Line Width<a class="anchor" aria-label="anchor" href="#adjust-line-width"></a></h3>
 <p>We adjusted line width universally earlier. If we want a unique line
-width for each level or attribute category in our spatial object, we can
-use the same syntax that we used for colors, above.</p>
+width for each attribute category in our spatial object, we can use the
+same syntax that we used for colors, above.</p>
 <p>We already know that we have four different <code>TYPE</code>s in the
 lines_HARV object, so we will set four different line widths.</p>
 <div class="codewrapper sourceCode" id="cb36">
@@ -970,8 +971,8 @@ the following thicknesses:</p>
 </button>
 <div id="collapseSolution4" class="accordion-collapse collapse" aria-labelledby="headingSolution4" data-bs-parent="#accordionSolution4">
 <div class="accordion-body">
-<p>First we need to look at the levels of our factor to see what order
-the road types are in:</p>
+<p>First we need to look at the values of our data to see what order the
+road types are in:</p>
 <div class="codewrapper sourceCode" id="cb39">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
