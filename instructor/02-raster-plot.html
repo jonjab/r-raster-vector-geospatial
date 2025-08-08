@@ -477,8 +477,9 @@ always produce a ’normal’ sort of bell curve.</p>
 <span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu">geom_bar</span><span class="op">(</span>data <span class="op">=</span> <span class="va">DSM_HARV_df</span>, <span class="fu">aes</span><span class="op">(</span><span class="va">fct_elevation</span><span class="op">)</span><span class="op">)</span></span></code></pre>
 </div>
-<figure><img src="../fig/02-raster-plot-rendered-histogram-breaks-ggplot-1.png" style="display: block; margin: auto;" class="figure mx-auto d-block"></figure><p>If we want to know the cutoff values for the groups, we can ask for
-the unique values of <code>fct_elevation</code>:</p>
+<figure><img src="../fig/02-raster-plot-rendered-histogram-breaks-ggplot-1.png" style="display: block; margin: auto;" class="figure mx-auto d-block"></figure><p>If we want to know the cutoff values for the groups, recall this base
+function from R. We can ask for the <code>unique</code> values of
+<code>fct_elevation</code>:</p>
 <div class="codewrapper sourceCode" id="cb2">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
