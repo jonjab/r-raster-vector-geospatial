@@ -70,8 +70,7 @@ ggplot() +
 
 <img src="fig/02-raster-plot-rendered-histogram-breaks-ggplot-1.png" style="display: block; margin: auto;" />
 
-If we want to know the cutoff values for the groups, we can ask for the unique 
-values of `fct_elevation`:
+If we want to know the cutoff values for the groups, recall this base function from R. We can ask for the `unique` values of `fct_elevation`:
 
 
 ``` r
