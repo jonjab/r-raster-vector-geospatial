@@ -70,7 +70,7 @@ map. To do this, we need to tell `ggplot` how many groups to break our data
 into, and where those breaks should be. To make these decisions, it is useful 
 to first explore the distribution of the data using a bar plot. To begin with, 
 we will use `dplyr`'s `mutate()` function combined with `cut()` to split the 
-data into 3 bins.
+data into 3 bins. A DEM will almost always produce a 'normal' sort of bell curve.
 
 ```{r histogram-breaks-ggplot}
 
