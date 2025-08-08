@@ -82,8 +82,7 @@ ggplot() +
 
 ```
 
-If we want to know the cutoff values for the groups, we can ask for the unique 
-values of `fct_elevation`:
+If we want to know the cutoff values for the groups, recall this base function from R. We can ask for the `unique` values of `fct_elevation`:
 
 ```{r unique-breaks}
 unique(DSM_HARV_df$fct_elevation)
