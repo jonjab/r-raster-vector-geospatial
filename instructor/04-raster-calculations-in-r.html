@@ -392,13 +392,13 @@
       </div>
       <hr></nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Raster Calculations</h1>
-        <p>Last updated on 2025-08-08 |
+        <p>Last updated on 2025-08-12 |
 
         <a href="https://github.com/datacarpentry/r-raster-vector-geospatial/edit/main/episodes/04-raster-calculations-in-r.Rmd" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
 
 
-        <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 60 minutes</p>
+        <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 40 minutes</p>
 
         <div class="text-end">
           <button role="button" aria-pressed="false" tabindex="0" id="expand-code" class="pull-right" data-expand="Expand All Solutions " data-collapse="Collapse All Solutions "> Expand All Solutions <i aria-hidden="true" data-feather="plus"></i></button>
@@ -423,8 +423,6 @@ for defined locations?</li>
 <div class="inner bordered">
 <h3 class="card-title">Objectives</h3>
 <ul><li>Perform a subtraction between two rasters using raster math.</li>
-<li>Perform a more efficient subtraction between two rasters using the
-raster <code>lapp()</code> function.</li>
 <li>Export raster data as a GeoTIFF file.</li>
 </ul></div>
 </div>
@@ -448,10 +446,9 @@ through the examples in this episode.</p>
 </div>
 <p>We often want to combine values of and perform calculations on
 rasters to create a new output raster. This episode covers how to
-subtract one raster from another using basic raster math and the
-<code>lapp()</code> function. It also covers how to extract pixel values
-from a set of locations - for example a buffer region around plot
-locations at a field site.</p>
+subtract one raster from another using basic raster math. It also covers
+how to extract pixel values from a set of locations - for example a
+buffer region around plot locations at a field site.</p>
 <section><h2 class="section-heading" id="raster-calculations-in-r">Raster Calculations in R<a class="anchor" aria-label="anchor" href="#raster-calculations-in-r"></a></h2>
 <hr class="half-width"><p>We often want to perform calculations on two or more rasters to
 create a new output raster. For example, if we are interested in mapping
@@ -685,9 +682,6 @@ data looks like. First we’ll plot the DTM elevation data:</p>
 <hr class="half-width"><p>We can calculate the difference between two rasters in two different
 ways:</p>
 <ul><li>by directly subtracting the two rasters in R using raster math</li>
-</ul><p>or for more efficient processing - particularly if our rasters are
-large and/or the calculations we are performing are complex:</p>
-<ul><li>using the <code>lapp()</code> function.</li>
 </ul></section><section><h2 class="section-heading" id="raster-math-canopy-height-models">Raster Math &amp; Canopy Height Models<a class="anchor" aria-label="anchor" href="#raster-math-canopy-height-models"></a></h2>
 <hr class="half-width"><p>We can perform raster calculations by subtracting (or adding,
 multiplying, etc) two rasters. In the geospatial world, we call this
@@ -859,8 +853,6 @@ which can take a list of raster objects (each one created by calling
 </div>
 </div>
 </div>
-<p>Let’s perform the same subtraction calculation that we calculated
-above using raster math, using the <code>lapp()</code> function.</p>
 <div id="data-tip-1" class="callout">
 <div class="callout-square">
 <i class="callout-icon" data-feather="bell"></i>
@@ -877,34 +869,6 @@ writing a custom function in R is:
 </div>
 </div>
 </div>
-<div class="codewrapper sourceCode" id="cb19">
-<h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">CHM_ov_HARV</span> <span class="op">&lt;-</span> <span class="fu">lapp</span><span class="op">(</span><span class="fu">sds</span><span class="op">(</span><span class="fu">list</span><span class="op">(</span><span class="va">DSM_HARV</span>, <span class="va">DTM_HARV</span><span class="op">)</span><span class="op">)</span>, </span>
-<span>                    fun <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">r1</span>, <span class="va">r2</span><span class="op">)</span> <span class="op">{</span> <span class="kw">return</span><span class="op">(</span> <span class="va">r1</span> <span class="op">-</span> <span class="va">r2</span><span class="op">)</span> <span class="op">}</span><span class="op">)</span></span></code></pre>
-</div>
-<p>Next we need to convert our new object to a data frame for plotting
-with <code>ggplot</code>.</p>
-<div class="codewrapper sourceCode" id="cb20">
-<h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">CHM_ov_HARV_df</span> <span class="op">&lt;-</span> <span class="fu">as.data.frame</span><span class="op">(</span><span class="va">CHM_ov_HARV</span>, xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre>
-</div>
-<p>Now we can plot the CHM:</p>
-<div class="codewrapper sourceCode" id="cb21">
-<h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="downlit sourceCode r">
-<code class="sourceCode R"><span> <span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>   <span class="fu">geom_raster</span><span class="op">(</span>data <span class="op">=</span> <span class="va">CHM_ov_HARV_df</span>, </span>
-<span>               <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, fill <span class="op">=</span> <span class="va">HARV_dsmCrop</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>   <span class="fu">scale_fill_gradientn</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Canopy Height"</span>, colors <span class="op">=</span> <span class="fu">terrain.colors</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>   <span class="fu">coord_quickmap</span><span class="op">(</span><span class="op">)</span></span></code></pre>
-</div>
-<figure><img src="../fig/04-raster-calculations-in-r-rendered-harv-chm-overlay-1.png" style="display: block; margin: auto;" class="figure mx-auto d-block"></figure><p>How do the plots of the CHM created with manual raster math and the
-<code>lapp()</code> function compare?</p>
 </section><section><h2 class="section-heading" id="export-a-geotiff">Export a GeoTIFF<a class="anchor" aria-label="anchor" href="#export-a-geotiff"></a></h2>
 <hr class="half-width"><p>Now that we’ve created a new raster, let’s export the data as a
 GeoTIFF file using the <code>writeRaster()</code> function.</p>
@@ -916,7 +880,7 @@ your working directory unless you specify a full file path.</p>
 <p>We will specify the output format (“GTiff”), the no data value
 <code>NAflag = -9999</code>. We will also tell R to overwrite any data
 that is already in a file of the same name.</p>
-<div class="codewrapper sourceCode" id="cb22">
+<div class="codewrapper sourceCode" id="cb19">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -979,17 +943,16 @@ Joaquin Experimental Range.</li>
 </button>
 <div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
 <div class="accordion-body">
-<ol style="list-style-type: decimal"><li>Use the <code>lapp()</code> function to subtract the two rasters
-&amp; create the CHM.</li>
-</ol><div class="codewrapper sourceCode" id="cb23">
+<ol style="list-style-type: decimal"><li>Use raster math function to subtract the two rasters &amp; create
+the CHM.</li>
+</ol><div class="codewrapper sourceCode" id="cb20">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">CHM_ov_SJER</span> <span class="op">&lt;-</span> <span class="fu">lapp</span><span class="op">(</span><span class="fu">sds</span><span class="op">(</span><span class="fu">list</span><span class="op">(</span><span class="va">DSM_SJER</span>, <span class="va">DTM_SJER</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                       fun <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">r1</span>, <span class="va">r2</span><span class="op">)</span><span class="op">{</span> <span class="kw">return</span><span class="op">(</span><span class="va">r1</span> <span class="op">-</span> <span class="va">r2</span><span class="op">)</span> <span class="op">}</span><span class="op">)</span></span></code></pre>
+<code class="sourceCode R"><span><span class="va">CHM_ov_SJER</span> <span class="op">&lt;-</span> <span class="va">DSM_SJER</span> <span class="op">-</span> <span class="va">DTM_SJER</span></span></code></pre>
 </div>
 <p>Convert the output to a dataframe:</p>
-<div class="codewrapper sourceCode" id="cb24">
+<div class="codewrapper sourceCode" id="cb21">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -997,7 +960,7 @@ Joaquin Experimental Range.</li>
 </div>
 <p>Create a histogram to check that the data distribution makes
 sense:</p>
-<div class="codewrapper sourceCode" id="cb25">
+<div class="codewrapper sourceCode" id="cb22">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -1010,7 +973,7 @@ sense:</p>
 <pre class="output" tabindex="0"><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
 </div>
 <figure><img src="../fig/04-raster-calculations-in-r-rendered-sjer-chm-overlay-hist-1.png" style="display: block; margin: auto;" class="figure mx-auto d-block"></figure><ol start="2" style="list-style-type: decimal"><li>Create a plot of the CHM:</li>
-</ol><div class="codewrapper sourceCode" id="cb27">
+</ol><div class="codewrapper sourceCode" id="cb24">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -1024,7 +987,7 @@ sense:</p>
 <span>     <span class="fu">coord_quickmap</span><span class="op">(</span><span class="op">)</span></span></code></pre>
 </div>
 <figure><img src="../fig/04-raster-calculations-in-r-rendered-sjer-chm-overlay-raster-1.png" style="display: block; margin: auto;" class="figure mx-auto d-block"></figure><ol start="3" style="list-style-type: decimal"><li>Export the CHM object to a file:</li>
-</ol><div class="codewrapper sourceCode" id="cb28">
+</ol><div class="codewrapper sourceCode" id="cb25">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -1036,7 +999,7 @@ sense:</p>
 <ol start="4" style="list-style-type: decimal"><li>Compare the SJER and HARV CHMs. Tree heights are much shorter in
 SJER. You can confirm this by looking at the histograms of the two
 CHMs.</li>
-</ol><div class="codewrapper sourceCode" id="cb29">
+</ol><div class="codewrapper sourceCode" id="cb26">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -1048,7 +1011,7 @@ CHMs.</li>
 </h3>
 <pre class="output" tabindex="0"><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
 </div>
-<figure><img src="../fig/04-raster-calculations-in-r-rendered-compare-chm-harv-sjer-1.png" style="display: block; margin: auto;" class="figure mx-auto d-block"></figure><div class="codewrapper sourceCode" id="cb31">
+<figure><img src="../fig/04-raster-calculations-in-r-rendered-compare-chm-harv-sjer-1.png" style="display: block; margin: auto;" class="figure mx-auto d-block"></figure><div class="codewrapper sourceCode" id="cb28">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -1072,8 +1035,6 @@ CHMs.</li>
 <div class="callout-inner">
 <div class="callout-content">
 <ul><li>Rasters can be computed on using mathematical functions.</li>
-<li>The <code>lapp()</code> function provides an efficient way to do
-raster math.</li>
 <li>The <code>writeRaster()</code> function can be used to write raster
 data to a file.</li>
 </ul></div>
@@ -1138,7 +1099,7 @@ data to a file.</li>
   "url": "https://datacarpentry.org/r-raster-vector-geospatial/instructor/04-raster-calculations-in-r.html",
   "identifier": "https://datacarpentry.org/r-raster-vector-geospatial/instructor/04-raster-calculations-in-r.html",
   "dateCreated": "2015-10-22",
-  "dateModified": "2025-08-08",
+  "dateModified": "2025-08-12",
   "datePublished": "2025-08-12"
 }
 

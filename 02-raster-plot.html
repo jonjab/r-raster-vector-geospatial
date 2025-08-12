@@ -390,7 +390,7 @@
       </div>
       <hr></nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Plot Raster Data</h1>
-        <p>Last updated on 2025-08-08 |
+        <p>Last updated on 2025-08-12 |
 
         <a href="https://github.com/datacarpentry/r-raster-vector-geospatial/edit/main/episodes/02-raster-plot.Rmd" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -582,9 +582,10 @@ being a different color:</p>
 </div>
 <figure><img src="fig/02-raster-plot-rendered-raster-with-breaks-1.png" style="display: block; margin: auto;" class="figure mx-auto d-block"></figure><p>The plot above uses the default colors inside <code>ggplot</code> for
 raster objects. We can specify our own colors to make the plot look a
-little nicer. R has a built in set of colors for plotting terrain, which
-are built in to the <code>terrain.colors()</code> function. Since we
-have three bins, we want to create a 3-color palette:</p>
+little nicer. R has a built in set of earthy colors for plotting
+terrain, which are built in to the <code>terrain.colors()</code>
+function. Since we have three bins, we want to create a 3-color
+palette:</p>
 <div class="codewrapper sourceCode" id="cb12">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
@@ -598,8 +599,9 @@ have three bins, we want to create a 3-color palette:</p>
 </div>
 <p>The <code>terrain.colors()</code> function returns <em>hex
 colors</em> - each of these character strings represents an earthy color
-that looks good on a landform map. To use these in our map, we pass them
-across using the <code>scale_fill_manual()</code> function.</p>
+that looks good on a landform map. You can also control alpha by adding
+another octet. To use these in our map, we pass them across using the
+<code>scale_fill_manual()</code> function.</p>
 <div class="codewrapper sourceCode" id="cb14">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
@@ -661,7 +663,7 @@ divided among the range of pixel values.</li>
   Answers
   </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb16">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -810,7 +812,7 @@ the data.</li>
   Answers
   </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb23">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -967,7 +969,7 @@ aesthetic.</li>
   "url": "https://datacarpentry.org/r-raster-vector-geospatial/02-raster-plot.html",
   "identifier": "https://datacarpentry.org/r-raster-vector-geospatial/02-raster-plot.html",
   "dateCreated": "2015-10-22",
-  "dateModified": "2025-08-08",
+  "dateModified": "2025-08-12",
   "datePublished": "2025-08-12"
 }
 
