@@ -399,6 +399,22 @@ ggplot() +
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
+
+
+:::::::::::::::::::::::::::::::::::::::::  callout
+
+## Data Tip
+
+To create a SpatRasterDataset, we call the function `sds` which can take a list 
+of raster objects (each one created by calling `rast`).
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+:::::::::::::::::::::::::::::::::::::::::  callout
+
+## Data Tip
+
 ## Efficient Raster Calculations
 
 Raster math, like we just did, is an appropriate approach to raster calculations
@@ -418,21 +434,7 @@ them using efficient processing methods. The syntax is
 In which raster can be either a SpatRaster or a SpatRasterDataset which is an 
 object that holds rasters. See `help(sds)`. 
 
-:::::::::::::::::::::::::::::::::::::::::  callout
-
-## Data Tip
-
-To create a SpatRasterDataset, we call the function `sds` which can take a list 
-of raster objects (each one created by calling `rast`).
-
-::::::::::::::::::::::::::::::::::::::::::::::::::
-
-
-:::::::::::::::::::::::::::::::::::::::::  callout
-
-## Data Tip
-
-A custom function consists of a defined set of commands performed on a input 
+lapp() is a custom function consists of a defined set of commands performed on a input 
 object. Custom functions are particularly useful for tasks that need to be 
 repeated over and over in the code. A simplified syntax for writing a custom 
 function in R is:
