@@ -170,7 +170,7 @@ ggplot() +
 
 The plot above uses the default colors inside `ggplot` for raster objects.
 We can specify our own colors to make the plot look a little nicer.
-R has a built in set of colors for plotting terrain, which are built in
+R has a built in set of earthy colors for plotting terrain, which are built in
 to the `terrain.colors()` function.
 Since we have three bins, we want to create a 3-color palette:
 
@@ -185,7 +185,8 @@ terrain.colors(3)
 
 The `terrain.colors()` function returns *hex colors* -
 each of these character strings represents an earthy color
-that looks good on a landform map.
+that looks good on a landform map. You can also control 
+alpha by adding another octet.
 To use these in our map, we pass them across using the
 `scale_fill_manual()` function.
 

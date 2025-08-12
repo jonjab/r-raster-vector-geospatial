@@ -1,7 +1,7 @@
 ---
 title: Raster Calculations
-teaching: 40
-exercises: 20
+teaching: 30
+exercises: 10
 source: Rmd
 ---
 
@@ -10,7 +10,6 @@ source: Rmd
 ::::::::::::::::::::::::::::::::::::::: objectives
 
 - Perform a subtraction between two rasters using raster math.
-- Perform a more efficient subtraction between two rasters using the raster `lapp()` function.
 - Export raster data as a GeoTIFF file.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -38,7 +37,7 @@ this episode.
 
 We often want to combine values of and perform calculations on rasters to 
 create a new output raster. This episode covers how to subtract one raster from
-another using basic raster math and the `lapp()` function. It also covers 
+another using basic raster math. It also covers 
 how to extract pixel values from a set of locations - for example a buffer 
 region around plot locations at a field site.
 
@@ -265,10 +264,6 @@ We can calculate the difference between two rasters in two different ways:
 
 - by directly subtracting the two rasters in R using raster math
 
-or for more efficient processing - particularly if our rasters are large and/or
-the calculations we are performing are complex:
-
-- using the `lapp()` function.
 
 ## Raster Math \& Canopy Height Models
 
@@ -432,8 +427,6 @@ of raster objects (each one created by calling `rast`).
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-Let's perform the same subtraction calculation that we calculated above using
-raster math, using the `lapp()` function.
 
 :::::::::::::::::::::::::::::::::::::::::  callout
 
@@ -449,34 +442,6 @@ function in R is:
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-``` r
-CHM_ov_HARV <- lapp(sds(list(DSM_HARV, DTM_HARV)), 
-                    fun = function(r1, r2) { return( r1 - r2) })
-```
-
-Next we need to convert our new object to a data frame for plotting with
-`ggplot`.
-
-
-``` r
-CHM_ov_HARV_df <- as.data.frame(CHM_ov_HARV, xy = TRUE)
-```
-
-Now we can plot the CHM:
-
-
-``` r
- ggplot() +
-   geom_raster(data = CHM_ov_HARV_df, 
-               aes(x = x, y = y, fill = HARV_dsmCrop)) + 
-   scale_fill_gradientn(name = "Canopy Height", colors = terrain.colors(10)) + 
-   coord_quickmap()
-```
-
-<img src="fig/04-raster-calculations-in-r-rendered-harv-chm-overlay-1.png" style="display: block; margin: auto;" />
-
-How do the plots of the CHM created with manual raster math and the `lapp()`
-function compare?
 
 ## Export a GeoTIFF
 
@@ -545,12 +510,11 @@ keep track of data from different sites!
 
 ## Answers
 
-1) Use the `lapp()` function to subtract the two rasters \& create the CHM.
+1) Use raster math function to subtract the two rasters \& create the CHM.
 
 
 ``` r
-CHM_ov_SJER <- lapp(sds(list(DSM_SJER, DTM_SJER)),
-                       fun = function(r1, r2){ return(r1 - r2) })
+CHM_ov_SJER <- DSM_SJER - DTM_SJER
 ```
 
 Convert the output to a dataframe:
@@ -636,7 +600,6 @@ ggplot(CHM_ov_SJER_df) +
 :::::::::::::::::::::::::::::::::::::::: keypoints
 
 - Rasters can be computed on using mathematical functions.
-- The `lapp()` function provides an efficient way to do raster math.
 - The `writeRaster()` function can be used to write raster data to a file.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
