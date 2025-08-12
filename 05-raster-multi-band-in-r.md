@@ -149,43 +149,9 @@ RGB_band2_HARV <-
        lyrs = 2)
 ```
 
-We can convert this data to a data frame and plot the same way we plotted the red band:
-
-
-``` r
-RGB_band2_HARV_df <- as.data.frame(RGB_band2_HARV, xy = TRUE)
-```
-
-
-``` r
-ggplot() +
-  geom_raster(data = RGB_band2_HARV_df,
-              aes(x = x, y = y, alpha = HARV_RGB_Ortho_2)) + 
-  coord_equal()
-```
-
-<img src="fig/05-raster-multi-band-in-r-rendered-rgb-harv-band2-1.png" style="display: block; margin: auto;" />
-
-:::::::::::::::::::::::::::::::::::::::  challenge
-
-## Challenge: Making Sense of Single Band Images
-
-Compare the plots of band 1 (red) and band 2 (green). Is the forested area 
-darker or lighter in band 2 (the green band) compared to band 1 (the red band)?
-
-:::::::::::::::  solution
-
-## Solution
-
-We'd expect a *brighter* value for the forest in band 2 (green) than in band 1 
-(red) because the leaves on trees of most often appear "green" - healthy leaves 
-reflect MORE green light than red light.
 
 
 
-:::::::::::::::::::::::::
-
-::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ## Raster Stacks in R
 
@@ -240,57 +206,7 @@ min value   :                0
 max value   :              255 
 ```
 
-We can also use the `ggplot` functions to plot the data in any layer of our 
-raster object. Remember, we need to convert to a data frame first.
 
-
-``` r
-RGB_stack_HARV_df  <- as.data.frame(RGB_stack_HARV, xy = TRUE)
-```
-
-Each band in our RasterStack gets its own column in the data frame. Thus we have:
-
-
-``` r
-str(RGB_stack_HARV_df)
-```
-
-``` output
-'data.frame':	7120141 obs. of  5 variables:
- $ x               : num  731999 731999 731999 731999 732000 ...
- $ y               : num  4713535 4713535 4713535 4713535 4713535 ...
- $ HARV_RGB_Ortho_1: num  0 2 6 0 16 0 0 6 1 5 ...
- $ HARV_RGB_Ortho_2: num  1 0 9 0 5 0 4 2 1 0 ...
- $ HARV_RGB_Ortho_3: num  0 10 1 0 17 0 4 0 0 7 ...
-```
-
-Let's create a histogram of the first band:
-
-
-``` r
-ggplot() +
-  geom_histogram(data = RGB_stack_HARV_df, aes(HARV_RGB_Ortho_1))
-```
-
-``` output
-`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-```
-
-<img src="fig/05-raster-multi-band-in-r-rendered-rgb-harv-hist-band1-1.png" style="display: block; margin: auto;" />
-
-And a raster plot of the second band:
-
-
-``` r
-ggplot() +
-  geom_raster(data = RGB_stack_HARV_df,
-              aes(x = x, y = y, alpha = HARV_RGB_Ortho_2)) + 
-  coord_quickmap()
-```
-
-<img src="fig/05-raster-multi-band-in-r-rendered-rgb-harv-plot-band2-1.png" style="display: block; margin: auto;" />
-
-We can access any individual band in the same way.
 
 ### Create A Three Band Image
 
