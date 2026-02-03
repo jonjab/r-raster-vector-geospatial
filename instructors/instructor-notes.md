@@ -8,14 +8,13 @@ title: Instructor Notes
 ## Lesson motivation and learning objectives
 
 This lesson is designed to introduce learners to the fundamental principles and skills for working with
-raster and vector geospatial data in R. It begins by introducing the structure of and simple plotting of
-raster data. It then covers re-projection of raster data, performing raster math, and working with multi-band
-raster data. After introducing raster data, the lesson moves into working with vector data. Line, point, and
-polygon shapefiles are included in the data. Learners will plot multiple raster and/or vector layers
-in a single plot, and learn how to customize plot elements such as legends and titles. They will
-also learn how to read data in from a csv formatted file and re-format it to a shapefile. Lastly, learners
-will work with multi-layered raster data set representing time series data and extract summary statistics
-from this data.
+raster and vector geospatial data in R. It begins by introducing vector data - line, point, and
+polygon shapefiles. Learners will plot multiple vector layers in a single plot, and learn how to customize
+plot elements such as legends and titles. They will also learn how to read data in from a csv formatted file
+and re-format it to a shapefile. After mastering vector data in Episodes 01-05, the lesson moves into working
+with raster data (Episodes 06-10). It covers the structure and simple plotting of raster data, re-projection
+of raster data, performing raster math, and working with multi-band raster data. Lastly, learners will work
+with multi-layered raster data set representing time series data and extract summary statistics from this data.
 
 ## Lesson design
 
@@ -30,11 +29,46 @@ from this data.
   at the end of the first day, they will need to either save the workspace or reload the data and packages.
   Because of this, it is essential that learners save their code to a script throughout the lesson.
 
-#### [1 Intro to Raster Data in R](01-raster-structure.md)
+#### [1 Open and Plot Vector Layers](01-vector-open-shapefile-in-r.md)
 
 - Be sure to introduce the datasets that will be used in this lesson. There are many data files. It may
   be helpful to draw a diagram on the board showing the types of data that will be plotted and analyzed
   throughout the lesson.
+- Learners may have heard of the `sp` or `sf` packages. If it comes up, explain that `terra` is the
+  modern unified package for both raster and vector data, offering better performance and a consistent interface.
+  The `tidyterra` package extends `terra` with tidyverse-style functions.
+- There is a known bug in the `geom_spatvector()` function (inherited from `geom_sf()`) that leads to an
+  intermittent error on some platforms.
+  If you see the following error message, try to re-run your plotting command and it should work.
+  The `ggplot` development team is working on fixing this bug.
+
+* Error message *
+
+```error
+Error in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y,  :
+polygon edge not found
+```
+
+#### [2 Explore and Plot by Vector Attributes](02-vector-shapefile-attributes-in-r.md)
+
+- No notes yet. Please add your tips and comments!
+
+#### [3 Plot Multiple Vector Layers](03-vector-plot-shapefiles-custom-legend.md)
+
+- No notes yet. Please add your tips and comments!
+
+#### [4 Handling Spatial Projection \& CRS in R](04-vector-when-data-dont-line-up-crs.md)
+
+- Note that, although `ggplot` automatically reprojects vector data when plotting multiple shapefiles with
+  different projections together, it is still important to be aware of the CRSs of your data and to keep track
+  of how they are being transformed.
+
+#### [5 Convert from .csv to a Vector Layer](05-vector-csv-to-shapefile-in-r.md)
+
+- No notes yet. Please add your tips and comments!
+
+#### [6 Intro to Raster Data in R](06-raster-structure.md)
+
 - If the [Introduction to Geospatial Concepts](https://datacarpentry.org/organization-geospatial/) lesson was
   included in your workshop, learners will have been introduced to the GDAL library. It will be useful to make
   the connection back to that lesson explicitly.
@@ -48,7 +82,7 @@ from this data.
 - Be sure to draw a distinction between the DTM and the DSM files, as these two datasets will be used
   throughout the lesson.
 
-#### [2 Plot Raster Data in R](02-raster-plot.md)
+#### [7 Plot Raster Data in R](07-raster-plot.md)
 
 - `geom_bar()` is a new geom for the learners. They were introduced to `geom_col()` in the [Introduction to R for Geospatial Data](https://datacarpentry.org/r-intro-geospatial/) lesson.
 - `dplyr` syntax should be familiar to your learners from the [Introduction to R for Geospatial Data](https://datacarpentry.org/r-intro-geospatial/) lesson.
@@ -56,49 +90,16 @@ from this data.
 - Starting in this episode and continuing throughout the lesson, the `ggplot` calls can be very long. Be sure
   to explicitly describe each step of the function call and what it is doing for the overall plot.
 
-#### [3 Reproject Raster Data in R](03-raster-reproject-in-r.md)
+#### [8 Reproject Raster Data in R](08-raster-reproject-in-r.md)
 
 - No notes yet. Please add your tips and comments!
 
-#### [4 Raster Calculations in R](04-raster-calculations-in-r.md)
+#### [9 Raster Calculations in R](09-raster-calculations-in-r.md)
 
 - The `overlay()` function syntax is fairly complex compared to other function calls the learners have seen.
   Be sure to explain it in detail.
 
-#### [5 Work With Multi-Band Rasters in R](05-raster-multi-band-in-r.md)
-
-- No notes yet. Please add your tips and comments!
-
-#### [6 Open and Plot Shapefiles in R](06-vector-open-shapefile-in-r.md)
-
-- Learners may have heard of the `sp` package. If it comes up, explain that `sf` is a
-  more modern update of `sp`.
-- There is a known bug in the `geom_sf()` function that leads to an intermittent error on some platforms.
-  If you see the following error message, try to re-run your plotting command and it should work.
-  The `ggplot` development team is working on fixing this bug.
-
-* Error message *
-
-```error
-Error in grid.Call(C_textBounds, as.graphicsAnnot(x$label), x$x, x$y,  : 
-polygon edge not found
-```
-
-#### [7 Explore and Plot by Shapefile Attributes](07-vector-shapefile-attributes-in-r.md)
-
-- No notes yet. Please add your tips and comments!
-
-#### [8 Plot Multiple Vector Layers](08-vector-plot-shapefiles-custom-legend.md)
-
-- No notes yet. Please add your tips and comments!
-
-#### [9 Handling Spatial Projection \& CRS in R](09-vector-when-data-dont-line-up-crs.md)
-
-- Note that, although `ggplot` automatically reprojects vector data when plotting multiple shapefiles with
-  different projections together, it is still important to be aware of the CRSs of your data and to keep track
-  of how they are being transformed.
-
-#### [10 Convert from .csv to a Vector Layer](10-vector-csv-to-shapefile-in-r.md)
+#### [10 Work With Multi-Band Rasters in R](10-raster-multi-band-in-r.md)
 
 - No notes yet. Please add your tips and comments!
 
@@ -139,20 +140,19 @@ polygon edge not found
 ## Scheduling tips
 
 - You will almost certainly not have enough time to teach this entire curriculum. If pressed for time,
-  here is one possible shortened schedule you can use (used in a 4 half-day curriculum in May 2022):
+  here is one possible shortened schedule you can use (adapted for the vector-first episode order):
   - Day 1: Workshop intro, installation, troubleshooting. Episodes 1-5 of Introduction to R for Geospatial Data.
     Skip everything in Episode 3 after "Vectors and Type Coercion, but keep Challenge 4. Skip everything in
     Episode 4 starting at "Adding columns and rows in data frames". Only include the "Data frames" section of Episode 5.
     You can introduce factors on-the-fly in the rest of the curriculum.
-  - Day 2: Episodes 6-8 of Introduction to R for Geospatial Data, Episodes 6-8 of R for Raster and Vector Data (as far
-    as you get in Episode 8).
-  - Day 3: Episodes 8-10 of R for Raster and Vector Data, Episodes 1-2 of R for Raster and Vector Data.
-  - Day 4: Episodes 3, 11 of Raster and Vector Data (and whatever else you'd like to cover), workshop conclusion.
-- It is a good idea to start your teaching with **vector data** (which is more immediately relevant to a greater number of
-  researchers, particularly those outside of environmental sciences), then move to raster data if there is extra time.
+  - Day 2: Episodes 6-8 of Introduction to R for Geospatial Data, Episodes 1-3 of R for Raster and Vector Data (vector episodes).
+  - Day 3: Episodes 4-5 of R for Raster and Vector Data (finish vector), Episodes 6-7 of R for Raster and Vector Data (start raster).
+  - Day 4: Episodes 8, 11 of Raster and Vector Data (and whatever else you'd like to cover), workshop conclusion.
+- This lesson now starts with **vector data** (Episodes 01-05), which is more immediately relevant to a greater number of
+  researchers, particularly those outside of environmental sciences. Raster data (Episodes 06-10) is covered afterwards.
 - Skip Introduction to Geospatial Concepts. Spend at most 30 minutes reviewing things as this is currently not
   an interactive curriculum. Most of the concepts you can cover within the R for Raster and Vector Data curriculum.
-- Covering Episode 10 immediately after 3 can be helpful to solidify the concepts of projections
+- Covering Episode 05 (vector CSV to shapefile) immediately after Episode 04 (vector CRS) can be helpful to solidify the concepts of projections
 
 ## Common problems
 

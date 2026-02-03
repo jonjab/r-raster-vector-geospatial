@@ -60,7 +60,7 @@ difference vegetation index (NDVI) and RGB data from the Harvard Forest site.
 We introduced the concepts of NDVI and RGB data in 
 [an earlier lesson](https://datacarpentry.org/organization-geospatial/01-intro-raster-data) 
 and worked with an RGB RasterStack in the 
-[Work with Multi-band Rasters in R](https://datacarpentry.org/r-raster-vector-geospatial/05-raster-multi-band-in-r) episode.
+[Work with Multi-band Rasters in R](https://datacarpentry.org/r-raster-vector-geospatial/10-raster-multi-band-in-r) episode.
 
 In this episode, we will:
 
@@ -129,7 +129,7 @@ Now we have a list of all GeoTIFF files in the NDVI directory for Harvard
 Forest. The number at the start of the filenames represents the julilan day. 
 Next, we will create a stack of rasters from this list using the 
 `rast()` function. We worked with the `rast()` function in 
-[an earlier episode](05-raster-multi-band-in-r/).
+[an earlier episode](10-raster-multi-band-in-r/).
 
 ```{r create-timeSeries-raster-stack}
 ndvi_harv_stack <- rast(all_ndvi_harv)
