@@ -25,18 +25,18 @@ source("setup.R")
 
 ```{r load-libraries, echo=FALSE, results="hide", message=FALSE}
 library(terra)
+library(tidyterra)
 library(ggplot2)
 library(dplyr)
-library(sf)
 ```
 
 ```{r load-data, echo=FALSE, results="hide"}
 # learners will have this data loaded from previous episodes
 point_harv <-
-    st_read("data/NEON-DS-Site-Layout-Files/HARV/HARVtower_UTM18N.shp")
-lines_harv <- st_read("data/NEON-DS-Site-Layout-Files/HARV/HARV_roads.shp")
+    vect("data/NEON-DS-Site-Layout-Files/HARV/HARVtower_UTM18N.shp")
+lines_harv <- vect("data/NEON-DS-Site-Layout-Files/HARV/HARV_roads.shp")
 aoi_boundary_harv <-
-    st_read("data/NEON-DS-Site-Layout-Files/HARV/HarClip_UTMZ18.shp")
+    vect("data/NEON-DS-Site-Layout-Files/HARV/HarClip_UTMZ18.shp")
 ```
 
 ::::::::::::::::::::::::::::::::::::::::::  prereq
@@ -62,19 +62,19 @@ attribute values.
 We will continue using the `sf`, `terra` `dplyr` and `ggplot2` packages in this
 episode. Make sure that you have these packages loaded. We will continue to
 work with the three ESRI `shapefiles` (vector layers) that we loaded in the
-[Open and Plot Vector Layers in R](https://datacarpentry.org/r-raster-vector-geospatial/06-vector-open-shapefile-in-r) episode.
+[Open and Plot Vector Layers in R](https://datacarpentry.org/r-raster-vector-geospatial/01-vector-open-shapefile-in-r) episode.
 
 ## Query Vector Feature Metadata
 
 As we discussed in the
-[Open and Plot Vector Layers in R](https://datacarpentry.org/r-raster-vector-geospatial/06-vector-open-shapefile-in-r)
+[Open and Plot Vector Layers in R](https://datacarpentry.org/r-raster-vector-geospatial/01-vector-open-shapefile-in-r)
 episode, we can view metadata associated with an R object using:
 
-- `st_geometry_type()` - The type of vector data stored in the object.
+- `geomtype()` - The type of vector data stored in the object.
 - `nrow()` - The number of features in the object
-- `st_bbox()` - The spatial extent (geographic area covered by)
+- `ext()` - The spatial extent (geographic area covered by)
   of the object.
-- `st_crs()` - The CRS (spatial projection) of the data.
+- `crs()` - The CRS (spatial projection) of the data.
 
 We started to explore our `point_harv` object in the previous episode. To see a
 summary of all of the metadata associated with our `point_harv` object, we can
@@ -200,7 +200,7 @@ only two feature lines in our spatial object have the attribute
 
 ```{r plot-subset-shapefile, fig.cap="Map of the footpaths in the study area."}
 ggplot() +
-  geom_sf(data = footpath_harv) +
+  geom_spatvector(data = footpath_harv) +
   ggtitle("NEON Harvard Forest Field Site", subtitle = "Footpaths") +
   coord_sf()
 ```
@@ -216,7 +216,7 @@ connecting line thickness to a data variable.
 
 ```{r plot-subset-shapefile-unique-colors, fig.cap="Map of the footpaths in the study area where each feature is colored differently."}
 ggplot() +
-  geom_sf(data = footpath_harv, aes(color = factor(OBJECTID)), linewidth = 1.5) +
+  geom_spatvector(data = footpath_harv, aes(color = factor(OBJECTID)), linewidth = 1.5) +
   labs(color = 'Footpath ID') +
   ggtitle("NEON Harvard Forest Field Site", subtitle = "Footpaths") +
   coord_sf()
@@ -251,7 +251,7 @@ Now let's plot that data:
 
 ```{r harv-boardwalk-map, fig.cap="Map of the boardwalks in the study area."}
 ggplot() +
-  geom_sf(data = boardwalk_harv, linewidth = 1.5) +
+  geom_spatvector(data = boardwalk_harv, linewidth = 1.5) +
   ggtitle("NEON Harvard Forest Field Site", subtitle = "Boardwalks") +
   coord_sf()
 ```
@@ -284,7 +284,7 @@ Now we can plot the data:
 
 ```{r harv-stone-wall-map, fig.cap="Map of the stone walls in the study area where each feature is colored differently."}
 ggplot() +
-  geom_sf(data = stonewall_harv, aes(color = factor(OBJECTID)), linewidth = 1.5) +
+  geom_spatvector(data = stonewall_harv, aes(color = factor(OBJECTID)), linewidth = 1.5) +
   labs(color = 'Wall ID') +
   ggtitle("NEON Harvard Forest Field Site", subtitle = "Stonewalls") +
   coord_sf()
@@ -317,7 +317,7 @@ We can tell `ggplot` to use these colors when we plot the data.
 
 ```{r harv-paths-map, fig.cap="Roads and trails in the area."}
 ggplot() +
-  geom_sf(data = lines_harv, aes(color = TYPE)) +
+  geom_spatvector(data = lines_harv, aes(color = TYPE)) +
   scale_color_manual(values = road_colors) +
   labs(color = 'Road Type') +
   ggtitle("NEON Harvard Forest Field Site", subtitle = "Roads & Trails") +
@@ -342,7 +342,7 @@ We can use those line widths when we plot the data.
 
 ```{r harv-paths-map-wide, fig.cap="Roads and trails in the area demonstrating how to use different line thickness and colors."}
 ggplot() +
-  geom_sf(data = lines_harv, aes(color = TYPE, linewidth = TYPE)) +
+  geom_spatvector(data = lines_harv, aes(color = TYPE, linewidth = TYPE)) +
   scale_color_manual(values = road_colors) +
   labs(color = 'Road Type') +
   scale_linewidth_manual(values = line_widths) +
@@ -390,7 +390,7 @@ Now we can create our plot.
 
 ```{r harv-path-line-types, fig.cap="Roads and trails in the area with different line thickness for each type of paths."}
 ggplot() +
-  geom_sf(data = lines_harv, aes(linewidth = TYPE)) +
+  geom_spatvector(data = lines_harv, aes(linewidth = TYPE)) +
   scale_linewidth_manual(values = line_width) +
   ggtitle("NEON Harvard Forest Field Site",
           subtitle = "Roads & Trails - Line width varies") +
@@ -416,7 +416,7 @@ appearance of our legend by manually setting different parameters.
 
 ```{r add-legend-to-plot, fig.cap="Roads and trails in the study area using thicker lines than the previous figure."}
 ggplot() +
-  geom_sf(data = lines_harv, aes(color = TYPE), linewidth = 1.5) +
+  geom_spatvector(data = lines_harv, aes(color = TYPE), linewidth = 1.5) +
   scale_color_manual(values = road_colors) +
   labs(color = 'Road Type') +
   ggtitle("NEON Harvard Forest Field Site",
@@ -432,7 +432,7 @@ parameters.
 
 ```{r modify-legend-plot, fig.cap="Map of the paths in the study area with large-font and border around the legend."}
 ggplot() +
-  geom_sf(data = lines_harv, aes(color = TYPE), linewidth = 1.5) +
+  geom_spatvector(data = lines_harv, aes(color = TYPE), linewidth = 1.5) +
   scale_color_manual(values = road_colors) +
   labs(color = 'Road Type') +
   theme(legend.text = element_text(size = 20),
@@ -446,7 +446,7 @@ ggplot() +
 new_colors <- c("springgreen", "blue", "magenta", "orange")
 
 ggplot() +
-  geom_sf(data = lines_harv, aes(color = TYPE), linewidth = 1.5) +
+  geom_spatvector(data = lines_harv, aes(color = TYPE), linewidth = 1.5) +
   scale_color_manual(values = new_colors) +
   labs(color = 'Road Type') +
   theme(legend.text = element_text(size = 20),
@@ -512,8 +512,8 @@ line width.
 
 ```{r harv-paths-bike-horses, fig.cap="Roads and trails in the area highlighting paths where horses and bikes are allowed."}
 ggplot() +
-  geom_sf(data = lines_harv) +
-  geom_sf(data = roads_bike_horse, aes(color = BicyclesHo), linewidth = 2) +
+  geom_spatvector(data = lines_harv) +
+  geom_spatvector(data = roads_bike_horse, aes(color = BicyclesHo), linewidth = 2) +
   scale_color_manual(values = "magenta") +
   ggtitle("NEON Harvard Forest Field Site",
           subtitle = "Roads Where Bikes and Horses Are Allowed") +
@@ -541,9 +541,7 @@ column:
 
 ```{r}
 state_boundary_us <-
-st_read("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-State-Boundaries-Census-2014.shp") %>%
-# NOTE: We need neither Z nor M coordinates!
-st_zm()
+vect("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-State-Boundaries-Census-2014.shp")
 
 state_boundary_us$region <- as.factor(state_boundary_us$region)
 levels(state_boundary_us$region)
@@ -559,7 +557,7 @@ Now we can create our plot:
 
 ```{r colored-state-boundaries, fig.cap="Map of the continental United States where the state lines are colored by region."}
 ggplot() +
-  geom_sf(data = state_boundary_us, aes(color = region), linewidth = 1) +
+  geom_spatvector(data = state_boundary_us, aes(color = region), linewidth = 1) +
   scale_color_manual(values = colors) +
   ggtitle("Contiguous U.S. State Boundaries") +
   coord_sf()

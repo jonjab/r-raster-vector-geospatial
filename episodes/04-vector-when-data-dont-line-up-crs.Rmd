@@ -23,7 +23,7 @@ source("setup.R")
 
 ```{r load-libraries, echo=FALSE, results="hide", message=FALSE, warning=FALSE}
 library(terra)
-library(sf)
+library(tidyterra)
 library(ggplot2)
 library(dplyr)
 ```
@@ -39,7 +39,7 @@ episode.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-In [an earlier episode](https://datacarpentry.org/r-raster-vector-geospatial/03-raster-reproject-in-r)
+In [an earlier episode](https://datacarpentry.org/r-raster-vector-geospatial/08-raster-reproject-in-r)
 we learned how to handle a situation where you have two different files with
 raster data in different projections. Now we will apply those same principles
 to working with vector data.
@@ -50,13 +50,13 @@ We will learn how to map vector data that are in different CRSs and thus don't
 line up on a map.
 
 We will continue to work with the three ESRI `shapefiles` that we loaded in the
-[Open and Plot Vector Layers in R](https://datacarpentry.org/r-raster-vector-geospatial/06-vector-open-shapefile-in-r) episode.
+[Open and Plot Vector Layers in R](https://datacarpentry.org/r-raster-vector-geospatial/01-vector-open-shapefile-in-r) episode.
 
 ```{r load-data, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
 # learners will have this data loaded from previous episodes
-aoi_boundary_harv <- st_read("data/NEON-DS-Site-Layout-Files/HARV/HarClip_UTMZ18.shp")
-lines_harv <- st_read("data/NEON-DS-Site-Layout-Files/HARV/HARV_roads.shp")
-point_harv <- st_read("data/NEON-DS-Site-Layout-Files/HARV/HARVtower_UTM18N.shp")
+aoi_boundary_harv <- vect("data/NEON-DS-Site-Layout-Files/HARV/HarClip_UTMZ18.shp")
+lines_harv <- vect("data/NEON-DS-Site-Layout-Files/HARV/HARV_roads.shp")
+point_harv <- vect("data/NEON-DS-Site-Layout-Files/HARV/HARVtower_UTM18N.shp")
 chm_harv <- rast("data/NEON-DS-Airborne-Remote-Sensing/HARV/CHM/HARV_chmCrop.tif")
 chm_harv_df <- as.data.frame(chm_harv, xy = TRUE)
 road_colors <- c("blue", "green", "grey", "purple")[lines_harv$TYPE]
@@ -104,22 +104,22 @@ attributes to them if need be - for project specific mapping.
 
 ## Read US Boundary File
 
-We will use the `st_read()` function to import the
+We will use the `vect()` function to import the
 `/US-Boundary-Layers/US-State-Boundaries-Census-2014` layer into R. This layer
 contains the boundaries of all contiguous states in the U.S. Please note that
 these data have been modified and reprojected from the original data downloaded
 from the Census website to support the learning goals of this episode.
 
 ```{r read-shp}
-state_boundary_us <- st_read("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-State-Boundaries-Census-2014.shp") %>%
-  st_zm()
+state_boundary_us <- vect("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-State-Boundaries-Census-2014.shp") %>%
+  # terra handles Z/M automatically()
 ```
 
 Next, let's plot the U.S. states data:
 
 ```{r find-coordinates}
 ggplot() +
-  geom_sf(data = state_boundary_us) +
+  geom_spatvector(data = state_boundary_us) +
   ggtitle("Map of Contiguous US State Boundaries") +
   coord_sf()
 ```
@@ -131,8 +131,8 @@ nicer. We will import
 `NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-Boundary-Dissolved-States`.
 
 ```{r}
-us_outline <- st_read("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-Boundary-Dissolved-States.shp") %>%
-  st_zm()
+us_outline <- vect("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-Boundary-Dissolved-States.shp") %>%
+  # terra handles Z/M automatically()
 ```
 
 If we specify a thicker line width using `size = 2` for the border layer, it
@@ -141,8 +141,8 @@ boundaries and country boundaries.
 
 ```{r us-boundaries-thickness}
 ggplot() +
-  geom_sf(data = state_boundary_us, color = "gray60") +
-  geom_sf(data = us_outline, color = "black",alpha = 0.25,size = 5) +
+  geom_spatvector(data = state_boundary_us, color = "gray60") +
+  geom_spatvector(data = us_outline, color = "black",alpha = 0.25,size = 5) +
   ggtitle("Map of Contiguous US State Boundaries") +
   coord_sf()
 ```
@@ -152,7 +152,7 @@ As we are adding these layers, take note of the CRS of each object.
 First let's look at the CRS of our tower location object:
 
 ```{r crs-sleuthing-1}
-st_crs(point_harv)$proj4string
+crs(point_harv)$proj4string
 ```
 
 Our project string for `point_harv` specifies the UTM projection as follows:
@@ -171,8 +171,8 @@ zone.
 Let's check the CRS of our state and country boundary objects:
 
 ```{r crs-sleuthing-2}
-st_crs(state_boundary_us)$proj4string
-st_crs(us_outline)$proj4string
+crs(state_boundary_us)$proj4string
+crs(us_outline)$proj4string
 ```
 
 Our project string for `state_boundary_us` and `us_outline` specifies
@@ -210,13 +210,13 @@ object compared to the `state_boundary_us` object.
 First we'll look at the extent for our study site:
 
 ```{r view-extent-1}
-st_bbox(point_harv)
+ext(point_harv)
 ```
 
 And then the extent for the state boundary data.
 
 ```{r view-extent-2}
-st_bbox(state_boundary_us)
+ext(state_boundary_us)
 ```
 
 Note the difference in the units for each object. The extent for
@@ -240,7 +240,7 @@ represented in meters.
 
 ## Reproject Vector Data or No?
 
-We saw in [an earlier episode](https://datacarpentry.org/r-raster-vector-geospatial/03-raster-reproject-in-r) that when working
+We saw in [an earlier episode](https://datacarpentry.org/r-raster-vector-geospatial/08-raster-reproject-in-r) that when working
 with raster data in different CRSs, we needed to convert all objects to the
 same CRS. We can do the same thing with our vector data - however, we don't
 need to! When using the `ggplot2` package, `ggplot` automatically converts all
@@ -250,9 +250,9 @@ conversion:
 
 ```{r layer-point-on-states}
 ggplot() +
-  geom_sf(data = state_boundary_us, color = "gray60") +
-  geom_sf(data = us_outline, size = 5, alpha = 0.25, color = "black") +
-  geom_sf(data = point_harv, shape = 19, color = "purple") +
+  geom_spatvector(data = state_boundary_us, color = "gray60") +
+  geom_spatvector(data = us_outline, size = 5, alpha = 0.25, color = "black") +
+  geom_spatvector(data = point_harv, shape = 19, color = "purple") +
   ggtitle("Map of Contiguous US State Boundaries") +
   coord_sf()
 ```
@@ -276,15 +276,15 @@ Create a map of the North Eastern United States as follows:
 ## Answers
 
 ```{r ne-states-harv}
-ne_states_outline <- st_read("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/Boundary-US-State-NEast.shp") %>%
-  st_zm()
+ne_states_outline <- vect("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/Boundary-US-State-NEast.shp") %>%
+  # terra handles Z/M automatically()
 
 ggplot() +
-    geom_sf(data = ne_states_outline, aes(color ="color"),
+    geom_spatvector(data = ne_states_outline, aes(color ="color"),
             show.legend = "line") +
     scale_color_manual(name = "", labels = "State Boundary",
                        values = c("color" = "gray18")) +
-    geom_sf(data = point_harv, aes(shape = "shape"), color = "purple") +
+    geom_spatvector(data = point_harv, aes(shape = "shape"), color = "purple") +
     scale_shape_manual(name = "", labels = "Fisher Tower",
                        values = c("shape" = 19)) +
     ggtitle("Fisher Tower location") +

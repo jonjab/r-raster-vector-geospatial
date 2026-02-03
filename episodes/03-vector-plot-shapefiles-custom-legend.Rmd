@@ -26,16 +26,16 @@ source("setup.R")
 
 ```{r load-libraries, echo=FALSE, results="hide", message=FALSE}
 library(terra)
+library(tidyterra)
 library(ggplot2)
 library(dplyr)
-library(sf)
 ```
 
 ```{r load-data, echo=FALSE, results="hide", warning=FALSE}
 # learners will have this data loaded from an earlier episode
-aoi_boundary_harv <- st_read("data/NEON-DS-Site-Layout-Files/HARV/HarClip_UTMZ18.shp")
-lines_harv <- st_read("data/NEON-DS-Site-Layout-Files/HARV/HARV_roads.shp")
-point_harv <- st_read("data/NEON-DS-Site-Layout-Files/HARV/HARVtower_UTM18N.shp")
+aoi_boundary_harv <- vect("data/NEON-DS-Site-Layout-Files/HARV/HarClip_UTMZ18.shp")
+lines_harv <- vect("data/NEON-DS-Site-Layout-Files/HARV/HARV_roads.shp")
+point_harv <- vect("data/NEON-DS-Site-Layout-Files/HARV/HARVtower_UTM18N.shp")
 chm_harv <- rast("data/NEON-DS-Airborne-Remote-Sensing/HARV/CHM/HARV_chmCrop.tif")
 chm_harv_df <- as.data.frame(chm_harv, xy = TRUE)
 road_colors <- c("blue", "green", "navy", "purple")
@@ -53,7 +53,7 @@ episode.
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 This episode builds upon
-[the previous episode](https://datacarpentry.org/r-raster-vector-geospatial/07-vector-shapefile-attributes-in-r)
+[the previous episode](https://datacarpentry.org/r-raster-vector-geospatial/02-vector-shapefile-attributes-in-r)
 to work with vector layers in R and explore how to plot multiple
 vector layers. It also covers how to plot raster and vector data together on the
 same plot.
@@ -65,11 +65,11 @@ package also allows us to explore metadata using similar commands for both
 raster and vector files. Make sure that you have these packages loaded.
 
 We will continue to work with the three ESRI `shapefile` that we loaded in the
-[Open and Plot Vector Layers in R](https://datacarpentry.org/r-raster-vector-geospatial/06-vector-open-shapefile-in-r) episode.
+[Open and Plot Vector Layers in R](https://datacarpentry.org/r-raster-vector-geospatial/01-vector-open-shapefile-in-r) episode.
 
 ## Plotting Multiple Vector Layers
 
-In the [previous episode](07-vector-shapefile-attributes-in-r/), we learned how
+In the [previous episode](02-vector-shapefile-attributes-in-r/), we learned how
 to plot information from a single vector layer and do some plot customization
 including adding a custom legend. However, what if we want to create a more
 complex plot with many vector layers and unique symbols that need to be
@@ -84,9 +84,9 @@ layer the tower location and road data on top using `+`.
 
 ```{r plot-many-shapefiles}
 ggplot() +
-  geom_sf(data = aoi_boundary_harv, fill = "grey", color = "grey") +
-  geom_sf(data = lines_harv, aes(color = TYPE), size = 1) +
-  geom_sf(data = point_harv) +
+  geom_spatvector(data = aoi_boundary_harv, fill = "grey", color = "grey") +
+  geom_spatvector(data = lines_harv, aes(color = TYPE), size = 1) +
+  geom_spatvector(data = point_harv) +
   ggtitle("NEON Harvard Forest Field Site") +
   coord_sf()
 ```
@@ -94,16 +94,16 @@ ggplot() +
 Next, let's build a custom legend using the symbology (the colors and symbols)
 that we used to create the plot above. For example, it might be good if the
 lines were symbolized as lines. In the previous episode, you may have noticed
-that the default legend behavior for `geom_sf` is to draw a 'patch' for each
+that the default legend behavior for `geom_spatvector` is to draw a 'patch' for each
 legend entry. If you want the legend to draw lines or points, you need to add
-an instruction to the `geom_sf` call - in this case, `show.legend = 'line'`.
+an instruction to the `geom_spatvector` call - in this case, `show.legend = 'line'`.
 
 ```{r plot-custom-shape}
 ggplot() +
-  geom_sf(data = aoi_boundary_harv, fill = "grey", color = "grey") +
-  geom_sf(data = lines_harv, aes(color = TYPE),
+  geom_spatvector(data = aoi_boundary_harv, fill = "grey", color = "grey") +
+  geom_spatvector(data = lines_harv, aes(color = TYPE),
           show.legend = "line", size = 1) +
-  geom_sf(data = point_harv, aes(fill = Sub_Type), color = "black") +
+  geom_spatvector(data = point_harv, aes(fill = Sub_Type), color = "black") +
   scale_color_manual(values = road_colors) +
   scale_fill_manual(values = "black") +
   ggtitle("NEON Harvard Forest Field Site") +
@@ -115,9 +115,9 @@ and `fill` palettes.
 
 ```{r create-custom-legend}
 ggplot() +
-  geom_sf(data = aoi_boundary_harv, fill = "grey", color = "grey") +
-  geom_sf(data = point_harv, aes(fill = Sub_Type)) +
-  geom_sf(data = lines_harv, aes(color = TYPE), show.legend = "line",
+  geom_spatvector(data = aoi_boundary_harv, fill = "grey", color = "grey") +
+  geom_spatvector(data = point_harv, aes(fill = Sub_Type)) +
+  geom_spatvector(data = lines_harv, aes(color = TYPE), show.legend = "line",
           size = 1) +
   scale_color_manual(values = road_colors, name = "Line Type") +
   scale_fill_manual(values = "black", name = "Tower Location") +
@@ -126,7 +126,7 @@ ggplot() +
 ```
 
 Finally, it might be better if the points were symbolized as a symbol. We can
-customize this using `shape` parameters in our call to `geom_sf`: 16 is a point
+customize this using `shape` parameters in our call to `geom_spatvector`: 16 is a point
 symbol, 15 is a box.
 
 :::::::::::::::::::::::::::::::::::::::::  callout
@@ -141,9 +141,9 @@ type `?pch` into the R console.
 
 ```{r custom-symbols}
 ggplot() +
-  geom_sf(data = aoi_boundary_harv, fill = "grey", color = "grey") +
-  geom_sf(data = point_harv, aes(fill = Sub_Type), shape = 15) +
-  geom_sf(data = lines_harv, aes(color = TYPE),
+  geom_spatvector(data = aoi_boundary_harv, fill = "grey", color = "grey") +
+  geom_spatvector(data = point_harv, aes(fill = Sub_Type), shape = 15) +
+  geom_spatvector(data = lines_harv, aes(color = TYPE),
           show.legend = "line", size = 1) +
   scale_color_manual(values = road_colors, name = "Line Type") +
   scale_fill_manual(values = "black", name = "Tower Location") +
@@ -174,7 +174,7 @@ in the `soilTypeOr` attribute.
 
 ```{r}
 plot_locations <-
-  st_read("data/NEON-DS-Site-Layout-Files/HARV/PlotLocations_HARV.shp")
+  vect("data/NEON-DS-Site-Layout-Files/HARV/PlotLocations_HARV.shp")
 
 plot_locations$soilTypeOr <- as.factor(plot_locations$soilTypeOr)
 levels(plot_locations$soilTypeOr)
@@ -190,8 +190,8 @@ Finally, we will create our plot.
 
 ```{r harv-plot-locations-bg}
 ggplot() +
-  geom_sf(data = lines_harv, aes(color = TYPE), show.legend = "line") +
-  geom_sf(data = plot_locations, aes(fill = soilTypeOr),
+  geom_spatvector(data = lines_harv, aes(color = TYPE), show.legend = "line") +
+  geom_spatvector(data = plot_locations, aes(fill = soilTypeOr),
           shape = 21, show.legend = 'point') +
   scale_color_manual(name = "Line Type", values = road_colors,
      guide = guide_legend(override.aes = list(linetype = "solid",
@@ -208,8 +208,8 @@ values to the `scale_shape_manual()` argument.
 
 ```{r harv-plot-locations-pch}
 ggplot() +
-  geom_sf(data = lines_harv, aes(color = TYPE), show.legend = "line", size = 1) +
-  geom_sf(data = plot_locations, aes(fill = soilTypeOr, shape = soilTypeOr),
+  geom_spatvector(data = lines_harv, aes(color = TYPE), show.legend = "line", size = 1) +
+  geom_spatvector(data = plot_locations, aes(fill = soilTypeOr, shape = soilTypeOr),
           show.legend = 'point', size = 3) +
   scale_shape_manual(name = "Soil Type", values = c(21, 22)) +
   scale_color_manual(name = "Line Type", values = road_colors,
@@ -246,9 +246,9 @@ Be sure to give your plot a meaningful title.
 ```{r challenge-vector-raster-overlay, echo=TRUE}
 ggplot() +
   geom_raster(data = chm_harv_df, aes(x = x, y = y, fill = HARV_chmCrop)) +
-  geom_sf(data = lines_harv, color = "black") +
-  geom_sf(data = aoi_boundary_harv, color = "grey20", size = 1) +
-  geom_sf(data = point_harv, pch = 8) +
+  geom_spatvector(data = lines_harv, color = "black") +
+  geom_spatvector(data = aoi_boundary_harv, color = "grey20", size = 1) +
+  geom_spatvector(data = point_harv, pch = 8) +
   ggtitle("NEON Harvard Forest Field Site w/ Canopy Height Model") +
   coord_sf()
 ```
