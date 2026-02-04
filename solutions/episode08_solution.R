@@ -54,20 +54,38 @@ ggplot() +
 # CHALLENGE: Plot Raster & Vector Data Together
 # =============================================================================
 
-# Plot vector data (AOI, roads, tower) on top of CHM raster
+# Plot vector data (AOI, roads, tower) on top of DTM with hillshade
 
-# Load data
-chm_harv <- rast("site/built/data/NEON-DS-Airborne-Remote-Sensing/HARV/CHM/HARV_chmCrop.tif")
-chm_harv_df <- as.data.frame(chm_harv, xy = TRUE)
+# Import DTM
+dtm_harv <- rast("site/built/data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_dtmCrop.tif")
+
+# Import DTM hillshade (in WGS84)
+dtm_hill_harv_wgs <- rast("site/built/data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_DTMhill_WGS84.tif")
+
+# Reproject DTM hillshade to match DTM
+dtm_hill_harv <- project(dtm_hill_harv_wgs, crs(dtm_harv), res = 1)
+
+# Convert to data frames for ggplot
+dtm_harv_df <- as.data.frame(dtm_harv, xy = TRUE)
+dtm_hill_harv_df <- as.data.frame(dtm_hill_harv, xy = TRUE)
+
+# Load vector data
 aoi_boundary_harv <- vect("site/built/data/NEON-DS-Site-Layout-Files/HARV/HarClip_UTMZ18.shp")
 lines_harv <- vect("site/built/data/NEON-DS-Site-Layout-Files/HARV/HARV_roads.shp")
 point_harv <- vect("site/built/data/NEON-DS-Site-Layout-Files/HARV/HARVtower_UTM18N.shp")
 
 # Create plot
 ggplot() +
-  geom_raster(data = chm_harv_df, aes(x = x, y = y, fill = HARV_chmCrop)) +
+  geom_raster(data = dtm_hill_harv_df,
+              aes(x = x, y = y, alpha = HARV_DTMhill_WGS84)) +
+  scale_alpha(range = c(0.15, 0.65), guide = "none") +
+  geom_raster(data = dtm_harv_df,
+              aes(x = x, y = y, fill = HARV_dtmCrop), alpha = 0.7) +
+  scale_fill_viridis_c() +
   geom_spatvector(data = lines_harv, color = "black") +
-  geom_spatvector(data = aoi_boundary_harv, color = "grey20", size = 1) +
-  geom_spatvector(data = point_harv, pch = 8) +
-  ggtitle("NEON Harvard Forest Field Site w/ Canopy Height Model") +
+  geom_spatvector(data = aoi_boundary_harv, color = "grey20", linewidth = 1.5,
+                  fill = NA) +
+  geom_spatvector(data = point_harv, color = "red", size = 3) +
+  ggtitle("NEON Harvard Forest Field Site",
+          subtitle = "DTM with Hillshade and Site Features") +
   coord_sf()
