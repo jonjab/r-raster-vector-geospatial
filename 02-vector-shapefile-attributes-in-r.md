@@ -50,6 +50,27 @@ episode. Make sure that you have these packages loaded. We will continue to
 work with the three ESRI `shapefiles` (vector layers) that we loaded in the
 [Open and Plot Vector Layers in R](https://datacarpentry.org/r-raster-vector-geospatial/01-vector-open-shapefile-in-r) episode.
 
+Let's start with a quick plot to refresh our memory of what these data look like:
+
+
+``` r
+ggplot() +
+  geom_spatvector(data = aoi_boundary_harv, fill = "lightgreen", alpha = 0.3) +
+  geom_spatvector(data = lines_harv, color = "blue") +
+  geom_spatvector(data = point_harv, color = "red", size = 3) +
+  ggtitle("NEON Harvard Forest Field Site") +
+  coord_sf()
+```
+
+<div class="figure" style="text-align: center">
+<img src="fig/02-vector-shapefile-attributes-in-r-rendered-quick-explore-plot-1.png" alt="Quick overview of the three vector layers at Harvard Forest."  />
+<p class="caption">Quick overview of the three vector layers at Harvard Forest.</p>
+</div>
+
+This plot shows the study area boundary (the green polygon), the road and trail
+network (blue lines), and the tower location (red point). Now let's explore the
+attributes associated with these features.
+
 ## Query Vector Feature Metadata
 
 As we discussed in the
@@ -298,6 +319,23 @@ assigning a column name to the color aesthetic (`color =`). We use the syntax
 using the `linewidth =` parameter, as the default value of 0.5 can be hard to see.
 Note that size is placed outside of the `aes()` function, as we are not
 connecting line thickness to a data variable.
+
+:::::::::::::::::::::::::::::::::::::::::  callout
+
+## Understanding Legends in ggplot2
+
+A legend appears in `ggplot2` whenever you map a data variable to an aesthetic
+property *inside* the `aes()` function. In the code below, we're mapping the
+`OBJECTID` column to the `color` aesthetic with `aes(color = factor(OBJECTID))`.
+This tells ggplot: "make the color represent data values", which automatically
+creates a legend showing what each color means.
+
+If we set `color = "blue"` *outside* of `aes()`, all features would be blue
+with no legend, because we're not connecting color to data. The same principle
+applies to other aesthetics like `fill`, `linewidth`, `linetype`, and `shape`.
+
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 ``` r
@@ -621,14 +659,24 @@ generated.
 
 :::::::::::::::::::::::::::::::::::::::::  callout
 
-## Data Tip
+## Avoiding Repetitive Theme Code
 
-You can modify the default R color palette using the palette method. For
-example `palette(rainbow(6))` or `palette(terrain.colors(6))`. You can reset
-the palette colors using `palette("default")`!
+If you find yourself repeatedly typing the same `theme()` customizations for
+multiple plots, you have several options to reduce repetition:
 
-You can also use colorblind-friendly palettes such as those in the
-[viridis package](https://cran.r-project.org/package=viridis).
+1. Save theme settings as an object and add it to plots:
+   ```r
+   my_theme <- theme(legend.text = element_text(size = 20),
+                     legend.box.background = element_rect(linewidth = 1))
+   ggplot() + geom_spatvector(data = lines_harv) + my_theme
+   ```
+
+2. Use `theme_set()` to apply settings to all subsequent plots in your session:
+   ```r
+   theme_set(theme_bw() + theme(legend.position = "bottom"))
+   ```
+
+3. Create a custom theme function for project-specific styling
 
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
