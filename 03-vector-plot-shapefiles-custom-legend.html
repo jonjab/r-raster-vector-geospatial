@@ -421,7 +421,6 @@ ggplot?</li>
 <h3 class="card-title">Objectives</h3>
 <ul><li>Plot multiple vector layers in the same plot.</li>
 <li>Apply custom symbols to spatial objects in a plot.</li>
-<li>Create a multi-layered plot with raster and vector data.</li>
 </ul></div>
 </div>
 </div>
@@ -444,8 +443,7 @@ through the examples in this episode.</p>
 </div>
 <p>This episode builds upon <a href="https://datacarpentry.org/r-raster-vector-geospatial/02-vector-shapefile-attributes-in-r" class="external-link">the
 previous episode</a> to work with vector layers in R and explore how to
-plot multiple vector layers. It also covers how to plot raster and
-vector data together on the same plot.</p>
+plot multiple vector layers.</p>
 <section><h2 class="section-heading" id="load-the-data">Load the Data<a class="anchor" aria-label="anchor" href="#load-the-data"></a></h2>
 <hr class="half-width"><p>To work with vector data in R, we will exclusively use the
 <code>terra</code> package. <code>sf</code> could also be used.</p>
@@ -578,7 +576,7 @@ different symbol of <code>shape</code> value.</p></li>
   Answers
   </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
 <p>First we need to read in the data and see how many unique soils are
 represented in the <code>soilTypeOr</code> attribute.</p>
