@@ -150,7 +150,7 @@ As we are adding these layers, take note of the CRS of each object.
 First let's look at the CRS of our tower location object:
 
 ```{r crs-sleuthing-1}
-crs(point_harv)$proj4string
+crs(point_harv)
 ```
 
 Our project string for `point_harv` specifies the UTM projection as follows:
@@ -169,8 +169,8 @@ zone.
 Let's check the CRS of our state and country boundary objects:
 
 ```{r crs-sleuthing-2}
-crs(state_boundary_us)$proj4string
-crs(us_outline)$proj4string
+crs(state_boundary_us)
+crs(us_outline)
 ```
 
 Our project string for `state_boundary_us` and `us_outline` specifies
