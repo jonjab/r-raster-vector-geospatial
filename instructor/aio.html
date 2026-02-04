@@ -460,7 +460,7 @@
         
 <section id="aio-01-vector-open-shapefile-in-r"><p>Content from <a href="01-vector-open-shapefile-in-r.html">Open and Plot Vector Layers</a></p>
 <hr>
-<p>Last updated on 2026-02-03 |
+<p>Last updated on 2026-02-04 |
 
         <a href="https://github.com/datacarpentry/r-raster-vector-geospatial/edit/main/episodes/01-vector-open-shapefile-in-r.Rmd" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 30 minutes</p>
@@ -737,11 +737,11 @@ from the <code>tidyterra</code> package, which requires the
 <span>  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"AOI Boundary Plot"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">coord_sf</span><span class="op">(</span><span class="op">)</span></span></code></pre>
 </div>
-<figure><img src="../fig/01-vector-open-shapefile-in-r-rendered-plot-shapefile-1.png" alt="" style="display: block; margin: auto;" class="figure mx-auto d-block"></figure><p>On the boundary plot, the x and y axes are labeled in units of
-decimal degrees. However, the CRS for <code>aoi_boundary_harv</code> is
-UTM zone 18N, which has units of meters. <code>geom_spatvector()</code>
-will use the CRS of the data to set the CRS for the plot, so why is
-there a mismatch?</p>
+<figure><img src="../fig/01-vector-open-shapefile-in-r-rendered-plot-shapefile-1.png" alt="" style="display: block; margin: auto;" class="figure mx-auto d-block"></figure><p>On what may be the most boring plot ever, the x and y axes are
+labeled in units of decimal degrees. However, the CRS for
+<code>aoi_boundary_harv</code> is UTM zone 18N, which has units of
+meters. <code>geom_spatvector()</code> will use the CRS of the data to
+set the CRS for the plot, so why is there a mismatch?</p>
 <p>By default, <code>coord_sf()</code> generates a graticule with a CRS
 of WGS 84 (where the units are decimal degrees), and this sets our axis
 labels. To draw the graticule in the native CRS of our shapefile, we can
@@ -887,7 +887,7 @@ using the <code>geom_spatvector()</code> function from
 </div>
 </section></section><section id="aio-02-vector-shapefile-attributes-in-r"><p>Content from <a href="02-vector-shapefile-attributes-in-r.html">Explore and Plot by Vector Layer Attributes</a></p>
 <hr>
-<p>Last updated on 2026-02-03 |
+<p>Last updated on 2026-02-04 |
 
         <a href="https://github.com/datacarpentry/r-raster-vector-geospatial/edit/main/episodes/02-vector-shapefile-attributes-in-r.Rmd" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 <p>Estimated time: <i aria-hidden="true" data-feather="clock"></i> 60 minutes</p>
@@ -1089,7 +1089,7 @@ object?</p></li>
   Answers
   </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
 <ol style="list-style-type: decimal">
 <li>To find the number of attributes, we use the <code>ncol()</code>
@@ -1160,9 +1160,9 @@ function:</li>
 <p>We can explore individual values stored within a particular
 attribute. Comparing attributes to a spreadsheet or a data frame, this
 is similar to exploring values in a column. We did this with the
-<code>gapminder</code> dataframe in <a href="https://datacarpentry.org/r-intro-geospatial/5-data-subsetting" class="external-link">an
-earlier lesson</a>. For spatial objects, we can use the same syntax:
-<code>objectName$attributeName</code>.</p>
+<code>gapminder</code> dataframe if you took <a href="https://datacarpentry.org/r-intro-geospatial/5-data-subsetting" class="external-link">a
+brief intro to R earlier</a>. For spatial objects, we can use the same
+syntax: <code>objectName$attributeName</code>.</p>
 <p>We can see the contents of the <code>TYPE</code> field of our lines
 feature:</p>
 <div class="codewrapper sourceCode" id="cb17">
@@ -1198,9 +1198,8 @@ earlier lesson</a>.</p>
 <h3 id="subset-features">Subset Features<a class="anchor" aria-label="anchor" href="#subset-features"></a>
 </h3>
 <p>We can use the <code>filter()</code> function from <code>dplyr</code>
-that we worked with in <a href="https://datacarpentry.org/r-intro-geospatial/06-dplyr" class="external-link">an earlier
-lesson</a> to select a subset of features from a spatial object in R,
-just like with data frames.</p>
+to select a subset of features from a spatial object in R, just like
+with ordinary data frames.</p>
 <p>For example, we might be interested only in features that are of
 <code>TYPE</code> “footpath”. Once we subset out this data, we can use
 it as input to other code so that code only operates on the footpath
@@ -1249,7 +1248,6 @@ variable.</p>
 <pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_spatvector</span><span class="op">(</span>data <span class="op">=</span> <span class="va">footpath_harv</span>, <span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="fu">factor</span><span class="op">(</span><span class="va">OBJECTID</span><span class="op">)</span><span class="op">)</span>, linewidth <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">labs</span><span class="op">(</span>color <span class="op">=</span> <span class="st">'Footpath ID'</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"NEON Harvard Forest Field Site"</span>, subtitle <span class="op">=</span> <span class="st">"Footpaths"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">coord_sf</span><span class="op">(</span><span class="op">)</span></span></code></pre>
 </div>
@@ -1278,7 +1276,7 @@ it.</p>
   Answers
   </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
 <p>First we will save an object with only the boardwalk lines:</p>
 <div class="codewrapper sourceCode" id="cb25">
@@ -1338,7 +1336,7 @@ and plot it. For each plot, color each feature using a unique color.</p>
   Answer
   </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
 <div class="accordion-body">
 <p>First we will save an object with only the stone wall lines and check
 the number of features:</p>
@@ -1362,7 +1360,6 @@ the number of features:</p>
 <pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_spatvector</span><span class="op">(</span>data <span class="op">=</span> <span class="va">stonewall_harv</span>, <span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="fu">factor</span><span class="op">(</span><span class="va">OBJECTID</span><span class="op">)</span><span class="op">)</span>, linewidth <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">labs</span><span class="op">(</span>color <span class="op">=</span> <span class="st">'Wall ID'</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"NEON Harvard Forest Field Site"</span>, subtitle <span class="op">=</span> <span class="st">"Stonewalls"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">coord_sf</span><span class="op">(</span><span class="op">)</span></span></code></pre>
 </div>
@@ -1412,7 +1409,6 @@ data.</p>
 <code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_spatvector</span><span class="op">(</span>data <span class="op">=</span> <span class="va">lines_harv</span>, <span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">TYPE</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">scale_color_manual</span><span class="op">(</span>values <span class="op">=</span> <span class="va">road_colors</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">labs</span><span class="op">(</span>color <span class="op">=</span> <span class="st">'Road Type'</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"NEON Harvard Forest Field Site"</span>, subtitle <span class="op">=</span> <span class="st">"Roads &amp; Trails"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">coord_sf</span><span class="op">(</span><span class="op">)</span></span></code></pre>
 </div>
@@ -1440,7 +1436,6 @@ lines_HARV object, so we will set four different line widths.</p>
 <code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_spatvector</span><span class="op">(</span>data <span class="op">=</span> <span class="va">lines_harv</span>, <span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">TYPE</span>, linewidth <span class="op">=</span> <span class="va">TYPE</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">scale_color_manual</span><span class="op">(</span>values <span class="op">=</span> <span class="va">road_colors</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">labs</span><span class="op">(</span>color <span class="op">=</span> <span class="st">'Road Type'</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">scale_linewidth_manual</span><span class="op">(</span>values <span class="op">=</span> <span class="va">line_widths</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"NEON Harvard Forest Field Site"</span>,</span>
 <span>          subtitle <span class="op">=</span> <span class="st">"Roads &amp; Trails - Line width varies"</span><span class="op">)</span> <span class="op">+</span></span>
@@ -1479,7 +1474,7 @@ the following thicknesses:</p>
   Answers
   </h4>
 </button>
-<div id="collapseSolution4" class="accordion-collapse collapse" aria-labelledby="headingSolution4" data-bs-parent="#accordionSolution4">
+<div id="collapseSolution4" class="accordion-collapse collapse" data-bs-parent="#accordionSolution4" aria-labelledby="headingSolution4">
 <div class="accordion-body">
 <p>First we need to look at the values of our data to see what order the
 road types are in:</p>
@@ -1524,14 +1519,12 @@ of paths.
 </div>
 </div>
 <div class="section level3">
-<h3 id="add-plot-legend">Add Plot Legend<a class="anchor" aria-label="anchor" href="#add-plot-legend"></a>
+<h3 id="format-plot-legend">Format Plot Legend<a class="anchor" aria-label="anchor" href="#format-plot-legend"></a>
 </h3>
-<p>We can add a legend to our plot too. When we add a legend, we use the
-following elements to specify labels and colors:</p>
-<p>Let’s add a legend to our plot. We will use the
-<code>road_colors</code> object that we created above to color the
-legend. We can customize the appearance of our legend by manually
-setting different parameters.</p>
+<p>Let’s take control of the legend to our plot. We will use the
+<code>road_colors</code> object that we created above to visualize
+<code>lines_harv</code>. We can customize the title on the legend in
+<code>labs()</code>.</p>
 <div class="codewrapper sourceCode" id="cb42">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
@@ -1642,7 +1635,7 @@ bright color. All other lines can be black.</p>
   Answers
   </h4>
 </button>
-<div id="collapseSolution5" class="accordion-collapse collapse" aria-labelledby="headingSolution5" data-bs-parent="#accordionSolution5">
+<div id="collapseSolution5" class="accordion-collapse collapse" data-bs-parent="#accordionSolution5" aria-labelledby="headingSolution5">
 <div class="accordion-body">
 <p>First we explore the <code>BicyclesHo</code> attribute to learn the
 values that correspond to the roads we need.</p>
@@ -1717,7 +1710,7 @@ Add a legend.</li>
   Answers
   </h4>
 </button>
-<div id="collapseSolution6" class="accordion-collapse collapse" aria-labelledby="headingSolution6" data-bs-parent="#accordionSolution6">
+<div id="collapseSolution6" class="accordion-collapse collapse" data-bs-parent="#accordionSolution6" aria-labelledby="headingSolution6">
 <div class="accordion-body">
 <p>First we read in the data and check how many levels there are in the
 <code>region</code> column:</p>
@@ -1981,7 +1974,7 @@ different symbol of <code>shape</code> value.</p></li>
   Answers
   </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
 <p>First we need to read in the data and see how many unique soils are
 represented in the <code>soilTypeOr</code> attribute.</p>
@@ -2079,7 +2072,7 @@ as a base layer. On top of the CHM, please add:</p>
   Answers
   </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb10">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -4291,7 +4284,7 @@ divided among the range of pixel values.</li>
   Answers
   </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb16">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -4445,7 +4438,7 @@ the data.</li>
   Answers
   </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb23">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -4712,7 +4705,7 @@ each use?</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb6">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -4962,7 +4955,7 @@ DTM hillshade, to see how they are different.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Answers </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
 <p>The extent for <code>dtm_hill_utm_harv</code> is in UTMs so the
 extent is in meters. The extent for <code>dtm_hill_harv</code> is in
@@ -5082,7 +5075,7 @@ files.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Answers </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb30">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -5144,7 +5137,7 @@ to that map?</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution4" aria-expanded="false" aria-controls="collapseSolution4">
   <h4 class="accordion-header" id="headingSolution4"> Answers </h4>
 </button>
-<div id="collapseSolution4" class="accordion-collapse collapse" data-bs-parent="#accordionSolution4" aria-labelledby="headingSolution4">
+<div id="collapseSolution4" class="accordion-collapse collapse" aria-labelledby="headingSolution4" data-bs-parent="#accordionSolution4">
 <div class="accordion-body">
 <p>The maps look identical. Which is what they should be as the only
 difference is this one was reprojected from WGS84 to UTM prior to
@@ -5310,7 +5303,7 @@ maximum values?</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb1">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -5577,7 +5570,7 @@ title and no axes ticks / labels.</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Answers </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
 <ol style="list-style-type: decimal">
 <li>There are missing values in our data, so we need to specify
@@ -5816,7 +5809,7 @@ Joaquin Experimental Range.</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Answers </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
 <div class="accordion-body">
 <ol style="list-style-type: decimal">
 <li>Use the <code>lapp()</code> function to subtract the two rasters
@@ -7174,7 +7167,7 @@ Model.</li>
   Answers
   </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb17">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -7461,7 +7454,7 @@ averages returned.</p></li>
   Answers
   </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb38">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -7756,7 +7749,7 @@ questions.</p>
   Answers
   </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb8">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -8030,7 +8023,7 @@ these days?</p>
   Answers
   </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
 <p>First we need to load in the RGB data for Julian day 277 and look at
 its metadata.</p>
@@ -8270,7 +8263,7 @@ figure out how to change this setting.</p>
   Answers
   </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
 <p>Learners can find this information in the help files for the
 <code>theme()</code> function. The parameter to set is called
@@ -8517,7 +8510,7 @@ best?</p>
   Answers
   </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb17">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -8884,7 +8877,7 @@ directory.</p>
   Answers
   </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
 <p>First we will read in the NDVI data for the SJER field site.</p>
 <div class="codewrapper sourceCode" id="cb21">
@@ -8984,7 +8977,7 @@ in a different color.</p>
   Answers
   </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb27">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -9046,7 +9039,7 @@ Julian day, on the x-axis.</p>
   Answers
   </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb30">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -9212,7 +9205,7 @@ sites.</li>
   Answers
   </h4>
 </button>
-<div id="collapseSolution4" class="accordion-collapse collapse" aria-labelledby="headingSolution4" data-bs-parent="#accordionSolution4">
+<div id="collapseSolution4" class="accordion-collapse collapse" data-bs-parent="#accordionSolution4" aria-labelledby="headingSolution4">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb39">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -9310,8 +9303,8 @@ have the same column names.</li>
   "url": "https://datacarpentry.org/r-raster-vector-geospatial/instructor/aio.html",
   "identifier": "https://datacarpentry.org/r-raster-vector-geospatial/instructor/aio.html",
   "dateCreated": "2015-10-22",
-  "dateModified": "2026-02-03",
-  "datePublished": "2026-02-03"
+  "dateModified": "2026-02-04",
+  "datePublished": "2026-02-04"
 }
 
   </script><script>
