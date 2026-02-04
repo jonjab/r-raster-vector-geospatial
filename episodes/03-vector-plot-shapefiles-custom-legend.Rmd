@@ -186,6 +186,20 @@ Next we can create a new color palette with one color for each soil type.
 blue_orange <- c("cornflowerblue", "darkorange")
 ```
 
+:::::::::::::::::::::::::::::::::::::::::  callout
+
+## Alternative Color Palettes
+
+You can modify the default R color palette using the palette method. For
+example `palette(rainbow(6))` or `palette(terrain.colors(6))`. You can reset
+the palette colors using `palette("default")`!
+
+You can also use colorblind-friendly palettes such as those in the
+[viridis package](https://cran.r-project.org/package=viridis).
+
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
 Finally, we will create our plot.
 
 ```{r harv-plot-locations-bg}
