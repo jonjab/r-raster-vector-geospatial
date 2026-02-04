@@ -16,6 +16,7 @@ source: Rmd
 :::::::::::::::::::::::::::::::::::::::: questions
 
 - How do I work with raster data sets that are in different projections?
+- Are rasters and vectors compatible?
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -542,9 +543,51 @@ is this one was reprojected from WGS84 to UTM prior to plotting.
 
 
 
+:::::::::::::::::::::::::::::::::::::::  challenge
+
+## Challenge: Plot Raster \& Vector Data Together
+
+You can plot vector data layered on top of raster data using the `+` to add a
+layer in `ggplot`. Create a plot that uses the NEON AOI Canopy Height Model
+`data/NEON-DS-Airborne-Remote-Sensing/HARV/CHM/HARV_chmCrop.tif` as a base
+layer. On top of the CHM, please add:
+
+- The study site AOI.
+- Roads.
+- The tower location.
+
+Be sure to give your plot a meaningful title.
+
+:::::::::::::::  solution
+
+## Answers
+
+
+``` r
+ggplot() +
+  geom_raster(data = chm_harv_df, aes(x = x, y = y, fill = HARV_chmCrop)) +
+  geom_spatvector(data = lines_harv, color = "black") +
+  geom_spatvector(data = aoi_boundary_harv, color = "grey20", size = 1) +
+  geom_spatvector(data = point_harv, pch = 8) +
+  ggtitle("NEON Harvard Forest Field Site w/ Canopy Height Model") +
+  coord_sf()
+```
+
+``` error
+Error:
+! object 'chm_harv_df' not found
+```
+
+:::::::::::::::::::::::::
+
+::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+
+
 :::::::::::::::::::::::::::::::::::::::: keypoints
 
-- In order to plot two raster data sets together, they must be in the same CRS.
+- In order to plot two raster data sets together, they (generally?) must be in the same CRS.
 - Use the `project()` function to convert between CRSs.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::

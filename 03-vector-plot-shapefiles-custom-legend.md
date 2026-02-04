@@ -45,9 +45,8 @@ same plot.
 
 ## Load the Data
 
-To work with vector data in R, we can use the `sf` library. The `terra`
-package also allows us to explore metadata using similar commands for both
-raster and vector files. Make sure that you have these packages loaded.
+To work with vector data in R, we will exclusively use the `terra`
+package. `sf` could also be used. 
 
 We will continue to work with the three ESRI `shapefile` that we loaded in the
 [Open and Plot Vector Layers in R](https://datacarpentry.org/r-raster-vector-geospatial/01-vector-open-shapefile-in-r) episode.
@@ -67,6 +66,9 @@ will need to build a custom legend as well.
 To begin, we will create a plot with the site boundary as the first layer. Then
 layer the tower location and road data on top using `+`.
 
+Note that the legend only contains the lines, because that's where an
+aesthetic uses a variable.
+
 
 ``` r
 ggplot() +
@@ -79,9 +81,9 @@ ggplot() +
 
 <img src="fig/03-vector-plot-shapefiles-custom-legend-rendered-plot-many-shapefiles-1.png" alt="" style="display: block; margin: auto;" />
 
-Next, let's build a custom legend using the symbology (the colors and symbols)
+Next, let's customize legend a bit using the symbology (the colors and symbols)
 that we used to create the plot above. For example, it might be good if the
-lines were symbolized as lines. In the previous episode, you may have noticed
+lines were symbolized as lines (instead of the default little squares). In the previous episode, you may have noticed
 that the default legend behavior for `geom_spatvector` is to draw a 'patch' for each
 legend entry. If you want the legend to draw lines or points, you need to add
 an instruction to the `geom_spatvector` call - in this case, `show.legend = 'line'`.
@@ -154,7 +156,7 @@ ggplot() +
 
 1. Using the `NEON-DS-Site-Layout-Files/HARV/PlotLocations_HARV.shp` ESRI `shapefile`,
   create a map of study plot locations, with each point colored by the soil
-  type (`soilTypeOr`). How many different soil types are there at this
+  type (`soilTypeOr`). Make the colors "cornflowerblue" and "darkorange". How many different soil types are there at this
   particular field site? Overlay this layer on top of the `lines_harv` layer
   (the roads). Create a custom legend that applies line symbols to lines and
   point symbols to the points.
@@ -246,43 +248,6 @@ ggplot() +
 :::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
-
-:::::::::::::::::::::::::::::::::::::::  challenge
-
-## Challenge: Plot Raster \& Vector Data Together
-
-You can plot vector data layered on top of raster data using the `+` to add a
-layer in `ggplot`. Create a plot that uses the NEON AOI Canopy Height Model
-`data/NEON-DS-Airborne-Remote-Sensing/HARV/CHM/HARV_chmCrop.tif` as a base
-layer. On top of the CHM, please add:
-
-- The study site AOI.
-- Roads.
-- The tower location.
-
-Be sure to give your plot a meaningful title.
-
-:::::::::::::::  solution
-
-## Answers
-
-
-``` r
-ggplot() +
-  geom_raster(data = chm_harv_df, aes(x = x, y = y, fill = HARV_chmCrop)) +
-  geom_spatvector(data = lines_harv, color = "black") +
-  geom_spatvector(data = aoi_boundary_harv, color = "grey20", size = 1) +
-  geom_spatvector(data = point_harv, pch = 8) +
-  ggtitle("NEON Harvard Forest Field Site w/ Canopy Height Model") +
-  coord_sf()
-```
-
-<img src="fig/03-vector-plot-shapefiles-custom-legend-rendered-challenge-vector-raster-overlay-1.png" alt="" style="display: block; margin: auto;" />
-
-:::::::::::::::::::::::::
-
-::::::::::::::::::::::::::::::::::::::::::::::::::
-
 
 
 :::::::::::::::::::::::::::::::::::::::: keypoints

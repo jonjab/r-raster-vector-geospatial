@@ -97,15 +97,11 @@ from the Census website to support the learning goals of this episode.
 
 
 ``` r
-state_boundary_us <- vect("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-State-Boundaries-Census-2014.shp") %>%
-  # terra handles Z/M automatically()
+state_boundary_us <- vect("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-State-Boundaries-Census-2014.shp")
 ```
 
-``` error
-Error in parse(text = input): <text>:3:0: unexpected end of input
-1: state_boundary_us <- vect("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-State-Boundaries-Census-2014.shp") %>%
-2:   # terra handles Z/M automatically()
-  ^
+``` warning
+Warning: [vect] Z coordinates ignored
 ```
 
 Next, let's plot the U.S. states data:
@@ -118,10 +114,7 @@ ggplot() +
   coord_sf()
 ```
 
-``` error
-Error:
-! object 'state_boundary_us' not found
-```
+<img src="fig/04-vector-when-data-dont-line-up-crs-rendered-find-coordinates-1.png" alt="" style="display: block; margin: auto;" />
 
 ## U.S. Boundary Layer
 
@@ -131,15 +124,11 @@ nicer. We will import
 
 
 ``` r
-us_outline <- vect("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-Boundary-Dissolved-States.shp") %>%
-  # terra handles Z/M automatically()
+us_outline <- vect("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-Boundary-Dissolved-States.shp")
 ```
 
-``` error
-Error in parse(text = input): <text>:3:0: unexpected end of input
-1: us_outline <- vect("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-Boundary-Dissolved-States.shp") %>%
-2:   # terra handles Z/M automatically()
-  ^
+``` warning
+Warning: [vect] Z coordinates ignored
 ```
 
 If we specify a thicker line width using `size = 2` for the border layer, it
@@ -155,10 +144,7 @@ ggplot() +
   coord_sf()
 ```
 
-``` error
-Error:
-! object 'state_boundary_us' not found
-```
+<img src="fig/04-vector-when-data-dont-line-up-crs-rendered-us-boundaries-thickness-1.png" alt="" style="display: block; margin: auto;" />
 
 Next, let's add the location of a flux tower where our study area is.
 As we are adding these layers, take note of the CRS of each object.
@@ -195,8 +181,8 @@ crs(state_boundary_us)$proj4string
 ```
 
 ``` error
-Error in `h()`:
-! error in evaluating the argument 'x' in selecting a method for function 'crs': object 'state_boundary_us' not found
+Error in `crs(state_boundary_us)$proj4string`:
+! $ operator is invalid for atomic vectors
 ```
 
 ``` r
@@ -204,8 +190,8 @@ crs(us_outline)$proj4string
 ```
 
 ``` error
-Error in `h()`:
-! error in evaluating the argument 'x' in selecting a method for function 'crs': object 'us_outline' not found
+Error in `crs(us_outline)$proj4string`:
+! $ operator is invalid for atomic vectors
 ```
 
 Our project string for `state_boundary_us` and `us_outline` specifies
@@ -258,9 +244,8 @@ And then the extent for the state boundary data.
 ext(state_boundary_us)
 ```
 
-``` error
-Error in `h()`:
-! error in evaluating the argument 'x' in selecting a method for function 'ext': object 'state_boundary_us' not found
+``` output
+SpatExtent : -124.725839, -66.949895, 24.498131, 49.384358 (xmin, xmax, ymin, ymax)
 ```
 
 Note the difference in the units for each object. The extent for
@@ -302,10 +287,7 @@ ggplot() +
   coord_sf()
 ```
 
-``` error
-Error:
-! object 'state_boundary_us' not found
-```
+<img src="fig/04-vector-when-data-dont-line-up-crs-rendered-layer-point-on-states-1.png" alt="" style="display: block; margin: auto;" />
 
 :::::::::::::::::::::::::::::::::::::::  challenge
 
@@ -327,9 +309,14 @@ Create a map of the North Eastern United States as follows:
 
 
 ``` r
-ne_states_outline <- vect("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/Boundary-US-State-NEast.shp") %>%
-  # terra handles Z/M automatically()
+ne_states_outline <- vect("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/Boundary-US-State-NEast.shp")
+```
 
+``` warning
+Warning: [vect] Z coordinates ignored
+```
+
+``` r
 ggplot() +
     geom_spatvector(data = ne_states_outline, aes(color ="color"),
             show.legend = "line") +
@@ -343,18 +330,14 @@ ggplot() +
     coord_sf()
 ```
 
-``` warning
-Warning: [vect] Z coordinates ignored
-```
-
-``` error
-Error:
-! object 'ne_states_outline' not found
-```
+<img src="fig/04-vector-when-data-dont-line-up-crs-rendered-ne-states-harv-1.png" alt="" style="display: block; margin: auto;" />
 
 :::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+
 
 
 
