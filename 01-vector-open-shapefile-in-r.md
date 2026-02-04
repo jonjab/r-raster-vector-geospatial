@@ -224,7 +224,7 @@ ggplot() +
 <img src="fig/01-vector-open-shapefile-in-r-rendered-plot-shapefile-1.png" alt="" style="display: block; margin: auto;" />
 
 
-On the boundary plot, the x and y axes are labeled in units of decimal degrees. However, the CRS
+On what may be the most boring plot ever, the x and y axes are labeled in units of decimal degrees. However, the CRS
 for `aoi_boundary_harv` is UTM zone 18N, which has units of meters. `geom_spatvector()` will use
 the CRS of the data to set the CRS for the plot, so why is there a mismatch?
 

@@ -220,8 +220,8 @@ names(point_harv)
 
 We can explore individual values stored within a particular attribute.
 Comparing attributes to a spreadsheet or a data frame, this is similar to
-exploring values in a column. We did this with the `gapminder` dataframe in
-[an earlier lesson](https://datacarpentry.org/r-intro-geospatial/5-data-subsetting).
+exploring values in a column. We did this with the `gapminder` dataframe if you took
+[a brief intro to R earlier](https://datacarpentry.org/r-intro-geospatial/5-data-subsetting).
 For spatial objects, we can use the same syntax: `objectName$attributeName`.
 
 We can see the contents of the `TYPE` field of our lines feature:
@@ -254,10 +254,9 @@ unique(lines_harv$TYPE)
 
 ### Subset Features
 
-We can use the `filter()` function from `dplyr` that we worked with in
-[an earlier lesson](https://datacarpentry.org/r-intro-geospatial/06-dplyr)
-to select a subset of features from a spatial object in R, just like with data
-frames.
+We can use the `filter()` function from `dplyr` 
+to select a subset of features from a spatial object in R, just like with 
+ordinary data frames.
 
 For example, we might be interested only in features that are of `TYPE`
 "footpath". Once we subset out this data, we can use it as input to other code
@@ -304,7 +303,6 @@ connecting line thickness to a data variable.
 ``` r
 ggplot() +
   geom_spatvector(data = footpath_harv, aes(color = factor(OBJECTID)), linewidth = 1.5) +
-  labs(color = 'Footpath ID') +
   ggtitle("NEON Harvard Forest Field Site", subtitle = "Footpaths") +
   coord_sf()
 ```
@@ -395,7 +393,6 @@ Now we can plot the data:
 ``` r
 ggplot() +
   geom_spatvector(data = stonewall_harv, aes(color = factor(OBJECTID)), linewidth = 1.5) +
-  labs(color = 'Wall ID') +
   ggtitle("NEON Harvard Forest Field Site", subtitle = "Stonewalls") +
   coord_sf()
 ```
@@ -441,7 +438,6 @@ We can tell `ggplot` to use these colors when we plot the data.
 ggplot() +
   geom_spatvector(data = lines_harv, aes(color = TYPE)) +
   scale_color_manual(values = road_colors) +
-  labs(color = 'Road Type') +
   ggtitle("NEON Harvard Forest Field Site", subtitle = "Roads & Trails") +
   coord_sf()
 ```
@@ -473,7 +469,6 @@ We can use those line widths when we plot the data.
 ggplot() +
   geom_spatvector(data = lines_harv, aes(color = TYPE, linewidth = TYPE)) +
   scale_color_manual(values = road_colors) +
-  labs(color = 'Road Type') +
   scale_linewidth_manual(values = line_widths) +
   ggtitle("NEON Harvard Forest Field Site",
           subtitle = "Roads & Trails - Line width varies") +
@@ -547,15 +542,11 @@ ggplot() +
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-### Add Plot Legend
+### Format Plot Legend
 
-We can add a legend to our plot too. When we add a legend, we use the following
-elements to specify labels and colors:
-
-
-Let's add a legend to our plot. We will use the `road_colors` object
-that we created above to color the legend. We can customize the
-appearance of our legend by manually setting different parameters.
+Let's take control of the legend to our plot. We will use the `road_colors` object
+that we created above to visualize `lines_harv`. We can customize the
+title on the legend in `labs()`.
 
 
 
