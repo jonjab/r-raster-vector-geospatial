@@ -50,3 +50,4 @@ ggplot() +
   geom_spatvector(data = plot_locations_sp_harv, color = "orange") +
   geom_spatvector(data = newplot_sp_harv, color = "lightblue") +
   ggtitle("Map of All Plot Locations")
+
