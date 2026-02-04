@@ -111,8 +111,7 @@ these data have been modified and reprojected from the original data downloaded
 from the Census website to support the learning goals of this episode.
 
 ```{r read-shp}
-state_boundary_us <- vect("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-State-Boundaries-Census-2014.shp") %>%
-  # terra handles Z/M automatically()
+state_boundary_us <- vect("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-State-Boundaries-Census-2014.shp")
 ```
 
 Next, let's plot the U.S. states data:
@@ -131,8 +130,7 @@ nicer. We will import
 `NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-Boundary-Dissolved-States`.
 
 ```{r}
-us_outline <- vect("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-Boundary-Dissolved-States.shp") %>%
-  # terra handles Z/M automatically()
+us_outline <- vect("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-Boundary-Dissolved-States.shp")
 ```
 
 If we specify a thicker line width using `size = 2` for the border layer, it
@@ -276,8 +274,7 @@ Create a map of the North Eastern United States as follows:
 ## Answers
 
 ```{r ne-states-harv}
-ne_states_outline <- vect("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/Boundary-US-State-NEast.shp") %>%
-  # terra handles Z/M automatically()
+ne_states_outline <- vect("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/Boundary-US-State-NEast.shp")
 
 ggplot() +
     geom_spatvector(data = ne_states_outline, aes(color ="color"),
@@ -295,6 +292,9 @@ ggplot() +
 :::::::::::::::::::::::::
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+
 
 
 
