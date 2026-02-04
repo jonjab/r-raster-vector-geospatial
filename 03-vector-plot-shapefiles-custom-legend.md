@@ -11,7 +11,6 @@ source: Rmd
 
 - Plot multiple vector layers in the same plot.
 - Apply custom symbols to spatial objects in a plot.
-- Create a multi-layered plot with raster and vector data.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -40,8 +39,7 @@ episode.
 This episode builds upon
 [the previous episode](https://datacarpentry.org/r-raster-vector-geospatial/02-vector-shapefile-attributes-in-r)
 to work with vector layers in R and explore how to plot multiple
-vector layers. It also covers how to plot raster and vector data together on the
-same plot.
+vector layers.
 
 ## Load the Data
 
