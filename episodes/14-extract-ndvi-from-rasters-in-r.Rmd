@@ -28,6 +28,7 @@ source("setup.R")
 library(terra)
 library(ggplot2)
 library(dplyr)
+library(tidyterra)
 ```
 
 ```{r load-data, echo=FALSE, results="hide"}

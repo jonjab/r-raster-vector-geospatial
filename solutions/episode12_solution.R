@@ -8,6 +8,7 @@ rm(list = ls())
 library(terra)
 library(ggplot2)
 library(dplyr)
+library(tidyterra)
 library(scales)
 library(tidyr)
 

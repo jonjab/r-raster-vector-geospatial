@@ -8,6 +8,7 @@ rm(list = ls())
 library(terra)
 library(ggplot2)
 library(dplyr)
+library(tidyterra)
 
 # Load and prepare HARV data
 all_ndvi_harv <- list.files("site/built/data/NEON-DS-Landsat-NDVI/HARV/2011/NDVI",
@@ -18,7 +19,7 @@ names(ndvi_harv_stack) <- paste0("X", names(ndvi_harv_stack))
 ndvi_harv_stack <- ndvi_harv_stack / 10000
 
 # Calculate average NDVI for HARV
-avg_ndvi_harv <- as.data.frame(global(ndvi_harv_stack, mean))
+avg_ndvi_harv <- global(ndvi_harv_stack, mean)
 names(avg_ndvi_harv) <- "meanNDVI"
 avg_ndvi_harv$site <- "HARV"
 avg_ndvi_harv$year <- "2011"
@@ -43,7 +44,7 @@ names(ndvi_stack_sjer) <- paste0("X", names(ndvi_stack_sjer))
 ndvi_stack_sjer <- ndvi_stack_sjer / 10000
 
 # Calculate mean values
-avg_ndvi_sjer <- as.data.frame(global(ndvi_stack_sjer, mean))
+avg_ndvi_sjer <- global(ndvi_stack_sjer, mean)
 
 # Rename column and add site/year
 names(avg_ndvi_sjer) <- "meanNDVI"

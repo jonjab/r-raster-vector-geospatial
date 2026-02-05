@@ -43,8 +43,6 @@ aoi_boundary_harv <-
 chm_harv <-
   rast("data/NEON-DS-Airborne-Remote-Sensing/HARV/CHM/HARV_chmCrop.tif")
 
-chm_harv_df <- as.data.frame(chm_harv, xy = TRUE)
-
 # plot locations
 plot_locations_harv <-
   read.csv("data/NEON-DS-Site-Layout-Files/HARV/HARV_PlotLocations.csv")
@@ -95,10 +93,8 @@ we have worked with in this workshop:
 
 ```{r view-extents, echo=FALSE, results="hide"}
 # code not shown, for demonstration purposes only
-# create CHM as a vector layer
-chm_harv_sp <- vect(chm_harv_df, coords = c("x", "y"), crs = utm_18n_crs)
-# approximate the boundary box with a random sample of raster points
-CHM_rand_sample <- sample_n(chm_harv_sp, 10000)
+# create CHM as a vector layer using spatSample
+CHM_rand_sample <- spatSample(chm_harv, size = 10000, method = "random", as.points = TRUE, na.rm = TRUE)
 lines_harv <- vect("data/NEON-DS-Site-Layout-Files/HARV/HARV_roads.shp")
 plots_harv <-
   vect("data/NEON-DS-Site-Layout-Files/HARV/PlotLocations_HARV.shp")
@@ -141,7 +137,7 @@ be colored blue, and we use `fill = NA` to make the area transparent.
 
 ```{r crop-by-vector-extent}
 ggplot() +
-  geom_raster(data = chm_harv_df, aes(x = x, y = y, fill = HARV_chmCrop)) +
+  geom_spatraster(data = chm_harv) +
   scale_fill_gradientn(name = "Canopy Height", colors = terrain.colors(10)) +
   geom_spatvector(data = aoi_boundary_harv, color = "blue", fill = NA) +
   coord_sf()
@@ -157,20 +153,16 @@ chm_crop_harv <- crop(x = chm_harv, y = aoi_boundary_harv)
 ```
 
 Now we can plot the cropped CHM data, along with a boundary box showing the
-full CHM extent. However, remember, since this is raster data, we need to
-convert to a data frame in order to plot using `ggplot`. To get the boundary
-box from CHM, the `ext()` will extract the 4 corners of the rectangle that
-encompass all the features contained in this object. The `vectc()` converts
-these 4 coordinates into a polygon that we can plot:
+full CHM extent. To get the boundary box from CHM, the `ext()` will extract
+the 4 corners of the rectangle that encompass all the features contained in
+this object. The `vectc()` converts these 4 coordinates into a polygon that
+we can plot:
 
 ```{r show-cropped-area}
-chm_crop_harv_df <- as.data.frame(chm_crop_harv, xy = TRUE)
-
 ggplot() +
   geom_spatvector(data = vectc(ext(chm_harv)), fill = "green",
           color = "green", alpha = .2) +
-  geom_raster(data = chm_crop_harv_df,
-              aes(x = x, y = y, fill = HARV_chmCrop)) +
+  geom_spatraster(data = chm_crop_harv) +
   scale_fill_gradientn(name = "Canopy Height", colors = terrain.colors(10)) +
   coord_sf()
 ```
@@ -182,8 +174,7 @@ below).
 
 ```{r view-crop-extent}
 ggplot() +
-  geom_raster(data = chm_crop_harv_df,
-              aes(x = x, y = y, fill = HARV_chmCrop)) +
+  geom_spatraster(data = chm_crop_harv) +
   geom_spatvector(data = aoi_boundary_harv, color = "blue", fill = NA) +
   scale_fill_gradientn(name = "Canopy Height", colors = terrain.colors(10)) +
   coord_sf()
@@ -217,11 +208,8 @@ of the Canopy Height Model information.
 
 chm_crop_p_harv <- crop(x = chm_harv, y = plot_locations_sp_harv)
 
-chm_crop_p_harv_df <- as.data.frame(chm_crop_p_harv, xy = TRUE)
-
 ggplot() +
-  geom_raster(data = chm_crop_p_harv_df,
-              aes(x = x, y = y, fill = HARV_chmCrop)) +
+  geom_spatraster(data = chm_crop_p_harv) +
   scale_fill_gradientn(name = "Canopy Height", colors = terrain.colors(10)) +
   geom_spatvector(data = plot_locations_sp_harv) +
   coord_sf()
@@ -245,11 +233,9 @@ extent of our (cropped) raster data (dark green).
 
 ```{r, echo=FALSE}
 # code not shown, demonstration only
-# create chm_crop_p_harv as a vector layer
-chm_crop_p_harv_sp <- vect(chm_crop_p_harv_df, coords = c("x", "y"),
-                                  crs = utm_18n_crs)
 # approximate the boundary box with random sample of raster points
-chm_crop_p_harv_sp_rand_sample = sample_n(chm_crop_p_harv_sp, 10000)
+chm_crop_p_harv_sp_rand_sample <- spatSample(chm_crop_p_harv, size = 10000,
+                                              method = "random", as.points = TRUE, na.rm = TRUE)
 ```
 
 ```{r repeat-compare-data-extents, ref.label="compare-data-extents", echo=FALSE}
@@ -286,20 +272,13 @@ our raster to this extent object.
 chm_crop_harv_custom <- crop(x = chm_harv, y = new_extent)
 ```
 
-To plot this data using `ggplot()` we need to convert it to a dataframe.
-
-```{r}
-chm_crop_harv_custom_df <- as.data.frame(chm_crop_harv_custom, xy = TRUE)
-```
-
 Now we can plot this cropped data. We will show the AOI boundary on the same
 plot for scale.
 
 ```{r show-manual-crop-area}
 ggplot() +
   geom_spatvector(data = aoi_boundary_harv, color = "blue", fill = NA) +
-  geom_raster(data = chm_crop_harv_custom_df,
-              aes(x = x, y = y, fill = HARV_chmCrop)) +
+  geom_spatraster(data = chm_crop_harv_custom) +
   scale_fill_gradientn(name = "Canopy Height", colors = terrain.colors(10)) +
   coord_sf()
 ```

@@ -27,6 +27,7 @@ source("setup.R")
 library(terra)
 library(ggplot2)
 library(dplyr)
+library(tidyterra)
 ```
 
 ::::::::::::::::::::::::::::::::::::::::::  prereq
@@ -64,17 +65,12 @@ rgb_b_1_harv <-
        lyrs = 1)
 ```
 
-We need to convert this data to a data frame in order to plot it with `ggplot`.
-
-```{r}
-rgb_b_1_harv_df  <- as.data.frame(rgb_b_1_harv, xy = TRUE)
-```
+We can plot this directly with `ggplot` using `tidyterra`.
 
 ```{r harv-rgb-band1}
 ggplot() +
-  geom_raster(data = rgb_b_1_harv_df,
-              aes(x = x, y = y, alpha = HARV_RGB_Ortho_1)) + 
-  coord_quickmap()
+  geom_spatraster(data = rgb_b_1_harv, aes(alpha = HARV_RGB_Ortho_1)) +
+  coord_sf()
 ```
 
 To import the green band, we would use `lyrs = 2`.
@@ -155,33 +151,22 @@ view attributes for using an index value:
 rgb_stack_harv[[2]]
 ```
 
-We can also use the `ggplot` functions to plot the data in any layer of our 
-raster object. Remember, we need to convert to a data frame first.
-
-```{r}
-rgb_stack_harv_df  <- as.data.frame(rgb_stack_harv, xy = TRUE)
-```
-
-Each band in our RasterStack gets its own column in the data frame. Thus we have:
-
-```{r}
-str(rgb_stack_harv_df)
-```
+We can also use the `ggplot` functions to plot the data in any layer of our
+raster object.
 
 Let's create a histogram of the first band:
 
 ```{r rgb-harv-hist-band1}
 ggplot() +
-  geom_histogram(data = rgb_stack_harv_df, aes(HARV_RGB_Ortho_1))
+  geom_histogram(data = rgb_stack_harv, aes(x = HARV_RGB_Ortho_1))
 ```
 
 And a raster plot of the second band:
 
 ```{r rgb-harv-plot-band2}
 ggplot() +
-  geom_raster(data = rgb_stack_harv_df,
-              aes(x = x, y = y, alpha = HARV_RGB_Ortho_2)) + 
-  coord_quickmap()
+  geom_spatraster(data = rgb_stack_harv, aes(alpha = HARV_RGB_Ortho_2)) +
+  coord_sf()
 ```
 
 We can access any individual band in the same way.

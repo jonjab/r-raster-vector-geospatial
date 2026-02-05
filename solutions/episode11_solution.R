@@ -15,7 +15,6 @@ point_harv <- vect("site/built/data/NEON-DS-Site-Layout-Files/HARV/HARVtower_UTM
 lines_harv <- vect("site/built/data/NEON-DS-Site-Layout-Files/HARV/HARV_roads.shp")
 aoi_boundary_harv <- vect("site/built/data/NEON-DS-Site-Layout-Files/HARV/HarClip_UTMZ18.shp")
 chm_harv <- rast("site/built/data/NEON-DS-Airborne-Remote-Sensing/HARV/CHM/HARV_chmCrop.tif")
-chm_harv_df <- as.data.frame(chm_harv, xy = TRUE)
 plot_locations_harv <- read.csv("site/built/data/NEON-DS-Site-Layout-Files/HARV/HARV_PlotLocations.csv")
 utm_18n_crs <- crs(point_harv)
 plot_locations_sp_harv <- vect(plot_locations_harv,
@@ -28,12 +27,10 @@ plot_locations_sp_harv <- vect(plot_locations_harv,
 
 # 1) Crop the CHM to extent of study plot locations
 chm_crop_p_harv <- crop(x = chm_harv, y = plot_locations_sp_harv)
-chm_crop_p_harv_df <- as.data.frame(chm_crop_p_harv, xy = TRUE)
 
 # 2) Plot vegetation plot locations on top of CHM
 ggplot() +
-  geom_raster(data = chm_crop_p_harv_df,
-              aes(x = x, y = y, fill = HARV_chmCrop)) +
+  geom_spatraster(data = chm_crop_p_harv) +
   scale_fill_gradientn(name = "Canopy Height", colors = terrain.colors(10)) +
   geom_spatvector(data = plot_locations_sp_harv) +
   coord_sf()
