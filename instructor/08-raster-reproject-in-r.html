@@ -391,7 +391,7 @@
       </div>
       <hr></nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Reproject Raster Data</h1>
-        <p>Last updated on 2026-02-04 |
+        <p>Last updated on 2026-02-05 |
 
         <a href="https://github.com/datacarpentry/r-raster-vector-geospatial/edit/main/episodes/08-raster-reproject-in-r.Rmd" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -556,7 +556,7 @@ each use?</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb6">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -802,7 +802,7 @@ DTM hillshade, to see how they are different.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Answers </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
 <p>The extent for <code>dtm_hill_utm_harv</code> is in UTMs so the
 extent is in meters. The extent for <code>dtm_hill_harv</code> is in
@@ -920,7 +920,7 @@ files.</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution3" aria-expanded="false" aria-controls="collapseSolution3">
   <h4 class="accordion-header" id="headingSolution3"> Answers </h4>
 </button>
-<div id="collapseSolution3" class="accordion-collapse collapse" aria-labelledby="headingSolution3" data-bs-parent="#accordionSolution3">
+<div id="collapseSolution3" class="accordion-collapse collapse" data-bs-parent="#accordionSolution3" aria-labelledby="headingSolution3">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb30">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -981,7 +981,7 @@ to that map?</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution4" aria-expanded="false" aria-controls="collapseSolution4">
   <h4 class="accordion-header" id="headingSolution4"> Answers </h4>
 </button>
-<div id="collapseSolution4" class="accordion-collapse collapse" aria-labelledby="headingSolution4" data-bs-parent="#accordionSolution4">
+<div id="collapseSolution4" class="accordion-collapse collapse" data-bs-parent="#accordionSolution4" aria-labelledby="headingSolution4">
 <div class="accordion-body">
 <p>The maps look identical. Which is what they should be as the only
 difference is this one was reprojected from WGS84 to UTM prior to
@@ -1001,9 +1001,12 @@ Together</h3>
 <div class="callout-content">
 <p>You can plot vector data layered on top of raster data using the
 <code>+</code> to add a layer in <code>ggplot</code>. Create a plot that
-uses the NEON AOI Canopy Height Model
-<code>data/NEON-DS-Airborne-Remote-Sensing/HARV/CHM/HARV_chmCrop.tif</code>
-as a base layer. On top of the CHM, please add:</p>
+uses the NEON DTM
+(<code>data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_dtmCrop.tif</code>)
+with the DTM hillshade
+(<code>data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_DTMhill_WGS84.tif</code>)
+as a base layer. Remember the hillshade will need to be reprojected to
+match the DTM. On top of the hillshade and DTM, please add:</p>
 <ul><li>The study site AOI.</li>
 <li>Roads.</li>
 <li>The tower location.</li>
@@ -1016,25 +1019,48 @@ as a base layer. On top of the CHM, please add:</p>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution5" aria-expanded="false" aria-controls="collapseSolution5">
   <h4 class="accordion-header" id="headingSolution5"> Answers </h4>
 </button>
-<div id="collapseSolution5" class="accordion-collapse collapse" aria-labelledby="headingSolution5" data-bs-parent="#accordionSolution5">
+<div id="collapseSolution5" class="accordion-collapse collapse" data-bs-parent="#accordionSolution5" aria-labelledby="headingSolution5">
 <div class="accordion-body">
 <div class="codewrapper sourceCode" id="cb31">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_raster</span><span class="op">(</span>data <span class="op">=</span> <span class="va">chm_harv_df</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, fill <span class="op">=</span> <span class="va">HARV_chmCrop</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="co"># Import DTM</span></span>
+<span><span class="va">dtm_harv</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">rast</span><span class="op">(</span><span class="st">"data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_dtmCrop.tif"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Import DTM hillshade (in WGS84)</span></span>
+<span><span class="va">dtm_hill_harv_wgs</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">rast</span><span class="op">(</span><span class="st">"data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_DTMhill_WGS84.tif"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Reproject DTM hillshade to match DTM</span></span>
+<span><span class="va">dtm_hill_harv</span> <span class="op">&lt;-</span> <span class="fu">project</span><span class="op">(</span><span class="va">dtm_hill_harv_wgs</span>, <span class="fu">crs</span><span class="op">(</span><span class="va">dtm_harv</span><span class="op">)</span>, res <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Convert to data frames for ggplot</span></span>
+<span><span class="va">dtm_harv_df</span> <span class="op">&lt;-</span> <span class="fu">as.data.frame</span><span class="op">(</span><span class="va">dtm_harv</span>, xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">dtm_hill_harv_df</span> <span class="op">&lt;-</span> <span class="fu">as.data.frame</span><span class="op">(</span><span class="va">dtm_hill_harv</span>, xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create plot</span></span>
+<span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_raster</span><span class="op">(</span>data <span class="op">=</span> <span class="va">dtm_hill_harv_df</span>,</span>
+<span>              <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, alpha <span class="op">=</span> <span class="va">HARV_DTMhill_WGS84</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_alpha</span><span class="op">(</span>range <span class="op">=</span> <span class="fu">c</span><span class="op">(</span><span class="fl">0.15</span>, <span class="fl">0.65</span><span class="op">)</span>, guide <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_raster</span><span class="op">(</span>data <span class="op">=</span> <span class="va">dtm_harv_df</span>,</span>
+<span>              <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, fill <span class="op">=</span> <span class="va">HARV_dtmCrop</span><span class="op">)</span>, alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_fill_viridis_c</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_spatvector</span><span class="op">(</span>data <span class="op">=</span> <span class="va">lines_harv</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_spatvector</span><span class="op">(</span>data <span class="op">=</span> <span class="va">aoi_boundary_harv</span>, color <span class="op">=</span> <span class="st">"grey20"</span>, size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_spatvector</span><span class="op">(</span>data <span class="op">=</span> <span class="va">point_harv</span>, pch <span class="op">=</span> <span class="fl">8</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"NEON Harvard Forest Field Site w/ Canopy Height Model"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_spatvector</span><span class="op">(</span>data <span class="op">=</span> <span class="va">aoi_boundary_harv</span>, color <span class="op">=</span> <span class="st">"grey20"</span>, linewidth <span class="op">=</span> <span class="fl">1.5</span>,</span>
+<span>                  fill <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_spatvector</span><span class="op">(</span>data <span class="op">=</span> <span class="va">point_harv</span>, color <span class="op">=</span> <span class="st">"red"</span>, size <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"NEON Harvard Forest Field Site"</span>,</span>
+<span>          subtitle <span class="op">=</span> <span class="st">"DTM with Hillshade and Site Features"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">coord_sf</span><span class="op">(</span><span class="op">)</span></span></code></pre>
 </div>
 <div class="codewrapper">
 <h3 class="code-label">ERROR<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="error" tabindex="0"><code>Error:
-! object 'chm_harv_df' not found</code></pre>
+<pre class="error" tabindex="0"><code>Error in `geom_spatvector()`:
+! could not find function "geom_spatvector"</code></pre>
 </div>
 </div>
 </div>
@@ -1114,8 +1140,8 @@ CRSs.</li>
   "url": "https://datacarpentry.org/r-raster-vector-geospatial/instructor/08-raster-reproject-in-r.html",
   "identifier": "https://datacarpentry.org/r-raster-vector-geospatial/instructor/08-raster-reproject-in-r.html",
   "dateCreated": "2015-10-22",
-  "dateModified": "2026-02-04",
-  "datePublished": "2026-02-04"
+  "dateModified": "2026-02-05",
+  "datePublished": "2026-02-05"
 }
 
   </script><script>

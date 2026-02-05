@@ -394,7 +394,7 @@
       </div>
       <hr></nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Manipulate Raster Data</h1>
-        <p>Last updated on 2026-02-03 |
+        <p>Last updated on 2026-02-05 |
 
         <a href="https://github.com/datacarpentry/r-raster-vector-geospatial/edit/main/episodes/11-vector-raster-integration.Rmd" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -471,20 +471,8 @@ layers that we have worked with in this workshop:</p>
 </ul><div class="codewrapper">
 <h3 class="code-label">ERROR<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="error" tabindex="0"><code>Error in `.local()`:
-! unused argument (coords = c("x", "y"))</code></pre>
-</div>
-<div class="codewrapper">
-<h3 class="code-label">ERROR<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
 <pre class="error" tabindex="0"><code>Error:
-! object 'chm_harv_sp' not found</code></pre>
-</div>
-<div class="codewrapper">
-<h3 class="code-label">ERROR<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="error" tabindex="0"><code>Error in `h()`:
-! error in evaluating the argument 'x' in selecting a method for function 'convHull': object 'CHM_rand_sample' not found</code></pre>
+! error in evaluating the argument 'x' in selecting a method for function 'convHull': argument "y" is missing, with no default</code></pre>
 </div>
 <p>Frequent use cases of cropping a raster file include reducing file
 size and creating maps. Sometimes we have a raster file that is much
@@ -504,45 +492,45 @@ only include the area of interest (AOI). Let’s start by plotting the
 full extent of the CHM data and overlay where the AOI falls within it.
 The boundaries of the AOI will be colored blue, and we use
 <code>fill = NA</code> to make the area transparent.</p>
-<div class="codewrapper sourceCode" id="cb4">
+<div class="codewrapper sourceCode" id="cb2">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_raster</span><span class="op">(</span>data <span class="op">=</span> <span class="va">chm_harv_df</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, fill <span class="op">=</span> <span class="va">HARV_chmCrop</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_spatraster</span><span class="op">(</span>data <span class="op">=</span> <span class="va">chm_harv</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">scale_fill_gradientn</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Canopy Height"</span>, colors <span class="op">=</span> <span class="fu">terrain.colors</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_spatvector</span><span class="op">(</span>data <span class="op">=</span> <span class="va">aoi_boundary_harv</span>, color <span class="op">=</span> <span class="st">"blue"</span>, fill <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">coord_sf</span><span class="op">(</span><span class="op">)</span></span></code></pre>
+</div>
+<div class="codewrapper">
+<h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="output" tabindex="0"><code>&lt;SpatRaster&gt; resampled to 500380 cells.</code></pre>
 </div>
 <figure><img src="fig/11-vector-raster-integration-rendered-crop-by-vector-extent-1.png" alt="" style="display: block; margin: auto;" class="figure mx-auto d-block"></figure><p>Now that we have visualized the area of the CHM we want to subset, we
 can perform the cropping operation. We are going to <code>crop()</code>
 function from the raster package to create a new object with only the
 portion of the CHM data that falls within the boundaries of the AOI.</p>
-<div class="codewrapper sourceCode" id="cb5">
+<div class="codewrapper sourceCode" id="cb4">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">chm_crop_harv</span> <span class="op">&lt;-</span> <span class="fu">crop</span><span class="op">(</span>x <span class="op">=</span> <span class="va">chm_harv</span>, y <span class="op">=</span> <span class="va">aoi_boundary_harv</span><span class="op">)</span></span></code></pre>
 </div>
 <p>Now we can plot the cropped CHM data, along with a boundary box
-showing the full CHM extent. However, remember, since this is raster
-data, we need to convert to a data frame in order to plot using
-<code>ggplot</code>. To get the boundary box from CHM, the
+showing the full CHM extent. To get the boundary box from CHM, the
 <code>ext()</code> will extract the 4 corners of the rectangle that
 encompass all the features contained in this object. The
 <code>vectc()</code> converts these 4 coordinates into a polygon that we
 can plot:</p>
-<div class="codewrapper sourceCode" id="cb6">
+<div class="codewrapper sourceCode" id="cb5">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">chm_crop_harv_df</span> <span class="op">&lt;-</span> <span class="fu">as.data.frame</span><span class="op">(</span><span class="va">chm_crop_harv</span>, xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_spatvector</span><span class="op">(</span>data <span class="op">=</span> <span class="fu">vectc</span><span class="op">(</span><span class="fu">ext</span><span class="op">(</span><span class="va">chm_harv</span><span class="op">)</span><span class="op">)</span>, fill <span class="op">=</span> <span class="st">"green"</span>,</span>
 <span>          color <span class="op">=</span> <span class="st">"green"</span>, alpha <span class="op">=</span> <span class="fl">.2</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_raster</span><span class="op">(</span>data <span class="op">=</span> <span class="va">chm_crop_harv_df</span>,</span>
-<span>              <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, fill <span class="op">=</span> <span class="va">HARV_chmCrop</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_spatraster</span><span class="op">(</span>data <span class="op">=</span> <span class="va">chm_crop_harv</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">scale_fill_gradientn</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Canopy Height"</span>, colors <span class="op">=</span> <span class="fu">terrain.colors</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">coord_sf</span><span class="op">(</span><span class="op">)</span></span></code></pre>
 </div>
@@ -556,20 +544,19 @@ can plot:</p>
 much larger than the resulting cropped raster. Our new cropped CHM now
 has the same extent as the <code>aoi_boundary_harv</code> object that
 was used as a crop extent (blue border below).</p>
-<div class="codewrapper sourceCode" id="cb8">
+<div class="codewrapper sourceCode" id="cb7">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_raster</span><span class="op">(</span>data <span class="op">=</span> <span class="va">chm_crop_harv_df</span>,</span>
-<span>              <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, fill <span class="op">=</span> <span class="va">HARV_chmCrop</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_spatraster</span><span class="op">(</span>data <span class="op">=</span> <span class="va">chm_crop_harv</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_spatvector</span><span class="op">(</span>data <span class="op">=</span> <span class="va">aoi_boundary_harv</span>, color <span class="op">=</span> <span class="st">"blue"</span>, fill <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">scale_fill_gradientn</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Canopy Height"</span>, colors <span class="op">=</span> <span class="fu">terrain.colors</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">coord_sf</span><span class="op">(</span><span class="op">)</span></span></code></pre>
 </div>
 <figure><img src="fig/11-vector-raster-integration-rendered-view-crop-extent-1.png" alt="" style="display: block; margin: auto;" class="figure mx-auto d-block"></figure><p>We can look at the extent of all of our other objects for this field
 site.</p>
-<div class="codewrapper sourceCode" id="cb9">
+<div class="codewrapper sourceCode" id="cb8">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -580,7 +567,7 @@ site.</p>
 </h3>
 <pre class="output" tabindex="0"><code>SpatExtent : 731453, 733150, 4712471, 4713838 (xmin, xmax, ymin, ymax)</code></pre>
 </div>
-<div class="codewrapper sourceCode" id="cb11">
+<div class="codewrapper sourceCode" id="cb10">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -591,7 +578,7 @@ site.</p>
 </h3>
 <pre class="output" tabindex="0"><code>SpatExtent : 732128, 732251, 4713209, 4713359 (xmin, xmax, ymin, ymax)</code></pre>
 </div>
-<div class="codewrapper sourceCode" id="cb13">
+<div class="codewrapper sourceCode" id="cb12">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -602,7 +589,7 @@ site.</p>
 </h3>
 <pre class="output" tabindex="0"><code>SpatExtent : 732128.016925, 732251.102892, 4713208.71096, 4713359.17112 (xmin, xmax, ymin, ymax)</code></pre>
 </div>
-<div class="codewrapper sourceCode" id="cb15">
+<div class="codewrapper sourceCode" id="cb14">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -640,20 +627,22 @@ Model.</li>
 </button>
 <div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
 <div class="accordion-body">
-<div class="codewrapper sourceCode" id="cb17">
+<div class="codewrapper sourceCode" id="cb16">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">chm_crop_p_harv</span> <span class="op">&lt;-</span> <span class="fu">crop</span><span class="op">(</span>x <span class="op">=</span> <span class="va">chm_harv</span>, y <span class="op">=</span> <span class="va">plot_locations_sp_harv</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">chm_crop_p_harv_df</span> <span class="op">&lt;-</span> <span class="fu">as.data.frame</span><span class="op">(</span><span class="va">chm_crop_p_harv</span>, xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
 <span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_raster</span><span class="op">(</span>data <span class="op">=</span> <span class="va">chm_crop_p_harv_df</span>,</span>
-<span>              <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, fill <span class="op">=</span> <span class="va">HARV_chmCrop</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_spatraster</span><span class="op">(</span>data <span class="op">=</span> <span class="va">chm_crop_p_harv</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">scale_fill_gradientn</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Canopy Height"</span>, colors <span class="op">=</span> <span class="fu">terrain.colors</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_spatvector</span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_locations_sp_harv</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">coord_sf</span><span class="op">(</span><span class="op">)</span></span></code></pre>
+</div>
+<div class="codewrapper">
+<h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="output" tabindex="0"><code>&lt;SpatRaster&gt; resampled to 501032 cells.</code></pre>
 </div>
 <figure><img src="fig/11-vector-raster-integration-rendered-challenge-code-crop-raster-points-1.png" alt="" style="display: block; margin: auto;" class="figure mx-auto d-block"></figure></div>
 </div>
@@ -674,20 +663,8 @@ our (cropped) raster data (dark green).</p>
 <div class="codewrapper">
 <h3 class="code-label">ERROR<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="error" tabindex="0"><code>Error in `.local()`:
-! unused argument (coords = c("x", "y"))</code></pre>
-</div>
-<div class="codewrapper">
-<h3 class="code-label">ERROR<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
 <pre class="error" tabindex="0"><code>Error:
-! object 'chm_crop_p_harv_sp' not found</code></pre>
-</div>
-<div class="codewrapper">
-<h3 class="code-label">ERROR<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="error" tabindex="0"><code>Error in `h()`:
-! error in evaluating the argument 'x' in selecting a method for function 'convHull': object 'CHM_rand_sample' not found</code></pre>
+! error in evaluating the argument 'x' in selecting a method for function 'convHull': argument "y" is missing, with no default</code></pre>
 </div>
 </section><section><h2 class="section-heading" id="define-an-extent">Define an Extent<a class="anchor" aria-label="anchor" href="#define-an-extent"></a></h2>
 <hr class="half-width"><p>So far, we have used a vector layer to crop the extent of a raster
@@ -695,7 +672,7 @@ dataset. Alternatively, we can also the <code>ext()</code> function to
 define an extent to be used as a cropping boundary. This creates a new
 object of class extent. Here we will provide the <code>ext()</code>
 function our xmin, xmax, ymin, and ymax (in that order).</p>
-<div class="codewrapper sourceCode" id="cb21">
+<div class="codewrapper sourceCode" id="cb19">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -726,30 +703,21 @@ help file (<code>?terra::ext</code>).</p>
 <p>Once we have defined our new extent, we can use the
 <code>crop()</code> function to crop our raster to this extent
 object.</p>
-<div class="codewrapper sourceCode" id="cb23">
+<div class="codewrapper sourceCode" id="cb21">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">chm_crop_harv_custom</span> <span class="op">&lt;-</span> <span class="fu">crop</span><span class="op">(</span>x <span class="op">=</span> <span class="va">chm_harv</span>, y <span class="op">=</span> <span class="va">new_extent</span><span class="op">)</span></span></code></pre>
 </div>
-<p>To plot this data using <code>ggplot()</code> we need to convert it
-to a dataframe.</p>
-<div class="codewrapper sourceCode" id="cb24">
-<h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">chm_crop_harv_custom_df</span> <span class="op">&lt;-</span> <span class="fu">as.data.frame</span><span class="op">(</span><span class="va">chm_crop_harv_custom</span>, xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre>
-</div>
 <p>Now we can plot this cropped data. We will show the AOI boundary on
 the same plot for scale.</p>
-<div class="codewrapper sourceCode" id="cb25">
+<div class="codewrapper sourceCode" id="cb22">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_spatvector</span><span class="op">(</span>data <span class="op">=</span> <span class="va">aoi_boundary_harv</span>, color <span class="op">=</span> <span class="st">"blue"</span>, fill <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_raster</span><span class="op">(</span>data <span class="op">=</span> <span class="va">chm_crop_harv_custom_df</span>,</span>
-<span>              <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, fill <span class="op">=</span> <span class="va">HARV_chmCrop</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_spatraster</span><span class="op">(</span>data <span class="op">=</span> <span class="va">chm_crop_harv_custom</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">scale_fill_gradientn</span><span class="op">(</span>name <span class="op">=</span> <span class="st">"Canopy Height"</span>, colors <span class="op">=</span> <span class="fu">terrain.colors</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">coord_sf</span><span class="op">(</span><span class="op">)</span></span></code></pre>
 </div>
@@ -771,7 +739,7 @@ boundary or boundaries,</li>
 </ul><p>We will begin by extracting all canopy height pixel values located
 within our <code>aoi_boundary_harv</code> polygon which surrounds the
 tower located at the NEON Harvard Forest field site.</p>
-<div class="codewrapper sourceCode" id="cb26">
+<div class="codewrapper sourceCode" id="cb23">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -796,7 +764,7 @@ to better understand the structure or height distribution of trees at
 our site. We will use the column <code>HARV_chmCrop</code> from our data
 frame as our x values, as this column represents the tree heights for
 each pixel.</p>
-<div class="codewrapper sourceCode" id="cb28">
+<div class="codewrapper sourceCode" id="cb25">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -814,7 +782,7 @@ each pixel.</p>
 <figure><img src="fig/11-vector-raster-integration-rendered-view-extract-histogram-1.png" alt="" style="display: block; margin: auto;" class="figure mx-auto d-block"></figure><p>We can also use the <code>summary()</code> function to view
 descriptive statistics including min, max, and mean height values. These
 values help us better understand vegetation at our field site.</p>
-<div class="codewrapper sourceCode" id="cb30">
+<div class="codewrapper sourceCode" id="cb27">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -831,7 +799,7 @@ values help us better understand vegetation at our field site.</p>
 the type of summary statistic we are interested in using the
 <code>fun =</code> argument. Let’s extract a mean height value for our
 AOI.</p>
-<div class="codewrapper sourceCode" id="cb32">
+<div class="codewrapper sourceCode" id="cb29">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -861,7 +829,7 @@ region are included in the extract.</p>
 Image Source: National Ecological Observatory Network (NEON)</p>
 <p>Let’s put this into practice by figuring out the mean tree height in
 the 20m around the tower location (<code>point_harv</code>).</p>
-<div class="codewrapper sourceCode" id="cb34">
+<div class="codewrapper sourceCode" id="cb31">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -875,7 +843,7 @@ the 20m around the tower location (<code>point_harv</code>).</p>
 <pre class="error" tabindex="0"><code>Error in `h()`:
 ! error in evaluating the argument 'y' in selecting a method for function 'extract': unused argument (dist = 20)</code></pre>
 </div>
-<div class="codewrapper sourceCode" id="cb36">
+<div class="codewrapper sourceCode" id="cb33">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -914,7 +882,7 @@ averages returned.</p></li>
 </button>
 <div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
 <div class="accordion-body">
-<div class="codewrapper sourceCode" id="cb38">
+<div class="codewrapper sourceCode" id="cb35">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -930,7 +898,7 @@ averages returned.</p></li>
 <pre class="error" tabindex="0"><code>Error in `h()`:
 ! error in evaluating the argument 'y' in selecting a method for function 'extract': unused argument (dist = 20)</code></pre>
 </div>
-<div class="codewrapper sourceCode" id="cb40">
+<div class="codewrapper sourceCode" id="cb37">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -943,7 +911,7 @@ averages returned.</p></li>
 <pre class="error" tabindex="0"><code>Error:
 ! object 'avg_tree_ht_p' not found</code></pre>
 </div>
-<div class="codewrapper sourceCode" id="cb42">
+<div class="codewrapper sourceCode" id="cb39">
 <h3 class="code-label">R<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
 <pre class="downlit sourceCode r">
@@ -1038,8 +1006,8 @@ raster object that fall within a particular extent boundary.</li>
   "url": "https://datacarpentry.org/r-raster-vector-geospatial/11-vector-raster-integration.html",
   "identifier": "https://datacarpentry.org/r-raster-vector-geospatial/11-vector-raster-integration.html",
   "dateCreated": "2015-10-22",
-  "dateModified": "2026-02-03",
-  "datePublished": "2026-02-04"
+  "dateModified": "2026-02-05",
+  "datePublished": "2026-02-05"
 }
 
   </script><script>
