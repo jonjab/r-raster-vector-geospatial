@@ -35,33 +35,25 @@ this episode.
 
 ### Load the Data
 
-For this episode, we will use the DTM and DSM from the NEON Harvard Forest 
+For this episode, we will use the DTM and DSM from the NEON Harvard Forest
 Field site and San Joaquin Experimental Range. If you don't still have
-them loaded, do so now and turn them into dataframes:
+them loaded, do so now:
 
 # DSM (tree top) data for Harvard Forest
-dsm_harv <- 
+dsm_harv <-
   rast("data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif")
 
-dsm_harv_df <- as.data.frame(dsm_harv, xy = TRUE)
-
 # DTM (bare earth) data for Harvard Forest
-dtm_harv <- 
+dtm_harv <-
   rast("data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_dtmCrop.tif")
 
-dtm_harv_df <- as.data.frame(dtm_harv, xy = TRUE)
-
 # DSM data for SJER
-dsm_sjer <- 
+dsm_sjer <-
   rast("data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_dsmCrop.tif")
 
-dsm_sjer_df <- as.data.frame(dsm_sjer, xy = TRUE)
-
 # DTM data for SJER
-dtm_sjer <- 
+dtm_sjer <-
   rast("data/NEON-DS-Airborne-Remote-Sensing/SJER/DTM/SJER_dtmCrop.tif")
-
-dtm_sjer_df <- as.data.frame(dtm_sjer, xy = TRUE)
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -262,11 +254,14 @@ what this data looks like. First we'll plot the DTM elevation data:
 
 
 ``` r
- ggplot() +
-      geom_raster(data = dtm_harv_df , 
-              aes(x = x, y = y, fill = HARV_dtmCrop)) +
-     scale_fill_gradientn(name = "Elevation", colors = terrain.colors(10)) + 
-     coord_quickmap()
+ggplot() +
+  geom_spatraster(data = dtm_harv) +
+  scale_fill_gradientn(name = "Elevation", colors = terrain.colors(10)) +
+  coord_sf()
+```
+
+``` output
+<SpatRaster> resampled to 500380 cells.
 ```
 
 <img src="fig/09-raster-calculations-in-r-rendered-harv-dtm-plot-1.png" alt="" style="display: block; margin: auto;" />
@@ -275,25 +270,18 @@ And then the DSM elevation data:
 
 
 ``` r
- ggplot() +
-      geom_raster(data = dsm_harv_df , 
-              aes(x = x, y = y, fill = HARV_dsmCrop)) +
-     scale_fill_gradientn(name = "Elevation", colors = terrain.colors(10)) + 
-     coord_quickmap()
+ggplot() +
+  geom_spatraster(data = dsm_harv) +
+  scale_fill_gradientn(name = "Elevation", colors = terrain.colors(10)) +
+  coord_sf()
+```
+
+``` output
+<SpatRaster> resampled to 500380 cells.
 ```
 
 <img src="fig/09-raster-calculations-in-r-rendered-harv-dsm-plot-1.png" alt="" style="display: block; margin: auto;" />
 
-## Two Ways to Perform Raster Calculations
-
-We can calculate the difference between two rasters in two different ways:
-
-- by directly subtracting the two rasters in R using raster math
-
-or for more efficient processing - particularly if our rasters are large and/or
-the calculations we are performing are complex:
-
-- using the `lapp()` function.
 
 ## Raster Math \& Canopy Height Models
 
@@ -302,24 +290,24 @@ multiplying, etc) two rasters. In the geospatial world, we call this
 "raster math".
 
 Let's subtract the DTM from the DSM to create a Canopy Height Model.
-After subtracting, let's create a dataframe so we can plot with `ggplot`.
 
 
 ``` r
 chm_harv <- dsm_harv - dtm_harv
-
-chm_harv_df <- as.data.frame(chm_harv, xy = TRUE)
 ```
 
 We can now plot the output CHM.
 
 
 ``` r
- ggplot() +
-   geom_raster(data = chm_harv_df , 
-               aes(x = x, y = y, fill = HARV_dsmCrop)) + 
-   scale_fill_gradientn(name = "Canopy Height", colors = terrain.colors(10)) + 
-   coord_quickmap()
+ggplot() +
+  geom_spatraster(data = chm_harv) +
+  scale_fill_gradientn(name = "Canopy Height", colors = terrain.colors(10)) +
+  coord_sf()
+```
+
+``` output
+<SpatRaster> resampled to 500380 cells.
 ```
 
 <img src="fig/09-raster-calculations-in-r-rendered-harv-chm-plot-1.png" alt="" style="display: block; margin: auto;" />
@@ -329,12 +317,17 @@ Canopy Height Model (CHM).
 
 
 ``` r
-ggplot(chm_harv_df) +
-    geom_histogram(aes(HARV_dsmCrop))
+ggplot() +
+  geom_histogram(data = chm_harv, aes(x = HARV_dsmCrop))
 ```
 
 ``` output
 `stat_bin()` using `bins = 30`. Pick better value `binwidth`.
+```
+
+``` warning
+Warning: Removed 1 row containing non-finite outside the scale range
+(`stat_bin()`).
 ```
 
 <img src="fig/09-raster-calculations-in-r-rendered-create-hist-1.png" alt="" style="display: block; margin: auto;" />
@@ -364,7 +357,7 @@ like we might explore a dataset that we collected in the field.
 
 
 ``` r
-min(chm_harv_df$HARV_dsmCrop, na.rm = TRUE)
+min(values(chm_harv), na.rm = TRUE)
 ```
 
 ``` output
@@ -372,7 +365,7 @@ min(chm_harv_df$HARV_dsmCrop, na.rm = TRUE)
 ```
 
 ``` r
-max(chm_harv_df$HARV_dsmCrop, na.rm = TRUE)
+max(values(chm_harv), na.rm = TRUE)
 ```
 
 ``` output
@@ -385,42 +378,59 @@ max(chm_harv_df$HARV_dsmCrop, na.rm = TRUE)
 - Use the `min()`, `max()`, and `range()` functions.
 - Print the object and look at the `values` attribute.
 
-3) 
+3)
 
 ``` r
-ggplot(chm_harv_df) +
-    geom_histogram(aes(HARV_dsmCrop))
+ggplot() +
+  geom_histogram(data = chm_harv, aes(x = HARV_dsmCrop))
 ```
 
 ``` output
 `stat_bin()` using `bins = 30`. Pick better value `binwidth`.
 ```
 
+``` warning
+Warning: Removed 1 row containing non-finite outside the scale range
+(`stat_bin()`).
+```
+
 <img src="fig/09-raster-calculations-in-r-rendered-chm-harv-hist-1.png" alt="" style="display: block; margin: auto;" />
 
-4) 
+4)
 
 ``` r
-ggplot(chm_harv_df) +
-    geom_histogram(aes(HARV_dsmCrop), colour="black", 
-                   fill="darkgreen", bins = 6)
+ggplot() +
+  geom_histogram(data = chm_harv, aes(x = HARV_dsmCrop),
+                 colour = "black", fill = "darkgreen", bins = 6)
+```
+
+``` warning
+Warning: Removed 1 row containing non-finite outside the scale range
+(`stat_bin()`).
 ```
 
 <img src="fig/09-raster-calculations-in-r-rendered-chm-harv-hist-green-1.png" alt="" style="display: block; margin: auto;" />
 
-5) 
+5)
 
 ``` r
 custom_bins <- c(0, 10, 20, 30, 40)
-chm_harv_df <- chm_harv_df %>%
-                  mutate(canopy_discrete = cut(HARV_dsmCrop, 
-                                               breaks = custom_bins))
+# Create classification matrix
+class_matrix <- matrix(c(0, 10, 1,
+                         10, 20, 2,
+                         20, 30, 3,
+                         30, 40, 4),
+                       ncol = 3, byrow = TRUE)
+chm_harv_discrete <- classify(chm_harv, class_matrix)
 
 ggplot() +
-  geom_raster(data = chm_harv_df , aes(x = x, y = y,
-                                       fill = canopy_discrete)) + 
-     scale_fill_manual(values = terrain.colors(4)) + 
-     coord_quickmap()
+  geom_spatraster(data = chm_harv_discrete) +
+  scale_fill_gradientn(colors = terrain.colors(4)) +
+  coord_sf()
+```
+
+``` output
+<SpatRaster> resampled to 500380 cells.
 ```
 
 <img src="fig/09-raster-calculations-in-r-rendered-chm-harv-raster-1.png" alt="" style="display: block; margin: auto;" />
@@ -475,27 +485,22 @@ function in R is:
 
 
 ``` r
-chm_ov_harv <- lapp(sds(list(dsm_harv, dtm_harv)), 
-                    fun = function(r1, r2) { return( r1 - r2) })
-```
-
-Next we need to convert our new object to a data frame for plotting with
-`ggplot`.
-
-
-``` r
-chm_ov_harv_df <- as.data.frame(chm_ov_harv, xy = TRUE)
+chm_ov_harv <- lapp(sds(list(dsm_harv, dtm_harv)),
+                    fun = function(r1, r2) { return(r1 - r2) })
 ```
 
 Now we can plot the CHM:
 
 
 ``` r
- ggplot() +
-   geom_raster(data = chm_ov_harv_df, 
-               aes(x = x, y = y, fill = HARV_dsmCrop)) + 
-   scale_fill_gradientn(name = "Canopy Height", colors = terrain.colors(10)) + 
-   coord_quickmap()
+ggplot() +
+  geom_spatraster(data = chm_ov_harv) +
+  scale_fill_gradientn(name = "Canopy Height", colors = terrain.colors(10)) +
+  coord_sf()
+```
+
+``` output
+<SpatRaster> resampled to 500380 cells.
 ```
 
 <img src="fig/09-raster-calculations-in-r-rendered-harv-chm-overlay-1.png" alt="" style="display: block; margin: auto;" />
@@ -570,27 +575,19 @@ keep track of data from different sites!
 
 ## Answers
 
-1) Use the `lapp()` function to subtract the two rasters \& create the CHM.
+1) Use simple subtraction on the two rasters to create the CHM.
 
 
 ``` r
-chm_ov_sjer <- lapp(sds(list(dsm_sjer, dtm_sjer)),
-                       fun = function(r1, r2){ return(r1 - r2) })
-```
-
-Convert the output to a dataframe:
-
-
-``` r
-chm_ov_sjer_df <- as.data.frame(chm_ov_sjer, xy = TRUE)
+chm_sjer <- dsm_sjer - dtm_sjer
 ```
 
 Create a histogram to check that the data distribution makes sense:
 
 
 ``` r
-ggplot(chm_ov_sjer_df) +
-    geom_histogram(aes(SJER_dsmCrop))
+ggplot() +
+  geom_histogram(data = chm_sjer, aes(x = SJER_dsmCrop))
 ```
 
 ``` output
@@ -603,14 +600,15 @@ ggplot(chm_ov_sjer_df) +
 
 
 ``` r
- ggplot() +
-      geom_raster(data = chm_ov_sjer_df, 
-              aes(x = x, y = y, 
-                   fill = SJER_dsmCrop)
-              ) + 
-     scale_fill_gradientn(name = "Canopy Height", 
-        colors = terrain.colors(10)) + 
-     coord_quickmap()
+ggplot() +
+  geom_spatraster(data = chm_sjer) +
+  scale_fill_gradientn(name = "Canopy Height",
+                       colors = terrain.colors(10)) +
+  coord_sf()
+```
+
+``` output
+<SpatRaster> resampled to 500423 cells.
 ```
 
 <img src="fig/09-raster-calculations-in-r-rendered-sjer-chm-overlay-raster-1.png" alt="" style="display: block; margin: auto;" />
@@ -619,7 +617,7 @@ ggplot(chm_ov_sjer_df) +
 
 
 ``` r
-writeRaster(chm_ov_sjer, "chm_ov_sjer.tiff",
+writeRaster(chm_sjer, "chm_sjer.tiff",
             filetype = "GTiff",
             overwrite = TRUE,
             NAflag = -9999)
@@ -631,19 +629,24 @@ writeRaster(chm_ov_sjer, "chm_ov_sjer.tiff",
 
 
 ``` r
-ggplot(chm_harv_df) +
-    geom_histogram(aes(HARV_dsmCrop))
+ggplot() +
+  geom_histogram(data = chm_harv, aes(x = HARV_dsmCrop))
 ```
 
 ``` output
 `stat_bin()` using `bins = 30`. Pick better value `binwidth`.
 ```
 
+``` warning
+Warning: Removed 1 row containing non-finite outside the scale range
+(`stat_bin()`).
+```
+
 <img src="fig/09-raster-calculations-in-r-rendered-compare-chm-harv-sjer-1.png" alt="" style="display: block; margin: auto;" />
 
 ``` r
-ggplot(chm_ov_sjer_df) +
-    geom_histogram(aes(SJER_dsmCrop))
+ggplot() +
+  geom_histogram(data = chm_sjer, aes(x = SJER_dsmCrop))
 ```
 
 ``` output

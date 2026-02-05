@@ -65,20 +65,11 @@ we have worked with in this workshop:
 - A canopy height model (CHM) in GeoTIFF format -- green
 
 
-``` error
-Error in `.local()`:
-! unused argument (coords = c("x", "y"))
-```
+
 
 ``` error
 Error:
-! object 'chm_harv_sp' not found
-```
-
-
-``` error
-Error in `h()`:
-! error in evaluating the argument 'x' in selecting a method for function 'convHull': object 'CHM_rand_sample' not found
+! error in evaluating the argument 'x' in selecting a method for function 'convHull': argument "y" is missing, with no default
 ```
 
 Frequent use cases of cropping a raster file include reducing file size and
@@ -103,10 +94,14 @@ be colored blue, and we use `fill = NA` to make the area transparent.
 
 ``` r
 ggplot() +
-  geom_raster(data = chm_harv_df, aes(x = x, y = y, fill = HARV_chmCrop)) +
+  geom_spatraster(data = chm_harv) +
   scale_fill_gradientn(name = "Canopy Height", colors = terrain.colors(10)) +
   geom_spatvector(data = aoi_boundary_harv, color = "blue", fill = NA) +
   coord_sf()
+```
+
+``` output
+<SpatRaster> resampled to 500380 cells.
 ```
 
 <img src="fig/11-vector-raster-integration-rendered-crop-by-vector-extent-1.png" alt="" style="display: block; margin: auto;" />
@@ -122,21 +117,17 @@ chm_crop_harv <- crop(x = chm_harv, y = aoi_boundary_harv)
 ```
 
 Now we can plot the cropped CHM data, along with a boundary box showing the
-full CHM extent. However, remember, since this is raster data, we need to
-convert to a data frame in order to plot using `ggplot`. To get the boundary
-box from CHM, the `ext()` will extract the 4 corners of the rectangle that
-encompass all the features contained in this object. The `vectc()` converts
-these 4 coordinates into a polygon that we can plot:
+full CHM extent. To get the boundary box from CHM, the `ext()` will extract
+the 4 corners of the rectangle that encompass all the features contained in
+this object. The `vectc()` converts these 4 coordinates into a polygon that
+we can plot:
 
 
 ``` r
-chm_crop_harv_df <- as.data.frame(chm_crop_harv, xy = TRUE)
-
 ggplot() +
   geom_spatvector(data = vectc(ext(chm_harv)), fill = "green",
           color = "green", alpha = .2) +
-  geom_raster(data = chm_crop_harv_df,
-              aes(x = x, y = y, fill = HARV_chmCrop)) +
+  geom_spatraster(data = chm_crop_harv) +
   scale_fill_gradientn(name = "Canopy Height", colors = terrain.colors(10)) +
   coord_sf()
 ```
@@ -154,8 +145,7 @@ below).
 
 ``` r
 ggplot() +
-  geom_raster(data = chm_crop_harv_df,
-              aes(x = x, y = y, fill = HARV_chmCrop)) +
+  geom_spatraster(data = chm_crop_harv) +
   geom_spatvector(data = aoi_boundary_harv, color = "blue", fill = NA) +
   scale_fill_gradientn(name = "Canopy Height", colors = terrain.colors(10)) +
   coord_sf()
@@ -217,14 +207,15 @@ of the Canopy Height Model information.
 ``` r
 chm_crop_p_harv <- crop(x = chm_harv, y = plot_locations_sp_harv)
 
-chm_crop_p_harv_df <- as.data.frame(chm_crop_p_harv, xy = TRUE)
-
 ggplot() +
-  geom_raster(data = chm_crop_p_harv_df,
-              aes(x = x, y = y, fill = HARV_chmCrop)) +
+  geom_spatraster(data = chm_crop_p_harv) +
   scale_fill_gradientn(name = "Canopy Height", colors = terrain.colors(10)) +
   geom_spatvector(data = plot_locations_sp_harv) +
   coord_sf()
+```
+
+``` output
+<SpatRaster> resampled to 501032 cells.
 ```
 
 <img src="fig/11-vector-raster-integration-rendered-challenge-code-crop-raster-points-1.png" alt="" style="display: block; margin: auto;" />
@@ -246,20 +237,11 @@ extent of our vegetation plot layer will still extend further west than the
 extent of our (cropped) raster data (dark green).
 
 
-``` error
-Error in `.local()`:
-! unused argument (coords = c("x", "y"))
-```
+
 
 ``` error
 Error:
-! object 'chm_crop_p_harv_sp' not found
-```
-
-
-``` error
-Error in `h()`:
-! error in evaluating the argument 'x' in selecting a method for function 'convHull': object 'CHM_rand_sample' not found
+! error in evaluating the argument 'x' in selecting a method for function 'convHull': argument "y" is missing, with no default
 ```
 
 ## Define an Extent
@@ -301,13 +283,6 @@ our raster to this extent object.
 chm_crop_harv_custom <- crop(x = chm_harv, y = new_extent)
 ```
 
-To plot this data using `ggplot()` we need to convert it to a dataframe.
-
-
-``` r
-chm_crop_harv_custom_df <- as.data.frame(chm_crop_harv_custom, xy = TRUE)
-```
-
 Now we can plot this cropped data. We will show the AOI boundary on the same
 plot for scale.
 
@@ -315,8 +290,7 @@ plot for scale.
 ``` r
 ggplot() +
   geom_spatvector(data = aoi_boundary_harv, color = "blue", fill = NA) +
-  geom_raster(data = chm_crop_harv_custom_df,
-              aes(x = x, y = y, fill = HARV_chmCrop)) +
+  geom_spatraster(data = chm_crop_harv_custom) +
   scale_fill_gradientn(name = "Canopy Height", colors = terrain.colors(10)) +
   coord_sf()
 ```

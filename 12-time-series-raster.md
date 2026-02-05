@@ -221,28 +221,18 @@ xres(ndvi_harv_stack)
 
 ## Plotting Time Series Data
 
-Once we have created our RasterStack, we can visualize our data. We can use the 
-`ggplot()` command to create a multi-panelled plot showing each band in our 
-RasterStack. First we need to create a data frame object. Because there are 
-multiple columns in our data that are not variables, we will tidy (or "pivot") 
-the data so that we have a single column with the NDVI observations. We will 
-use the function `pivot_longer()` from the `tidyr` package to do this:
-
-
-``` r
-ndvi_harv_stack_df <- as.data.frame(ndvi_harv_stack, xy = TRUE) %>%
-    pivot_longer(-(x:y), names_to = "variable", values_to = "value")
-```
-
-Now we can plot our data using `ggplot()`. We want to create a separate panel 
-for each time point in our time series, so we will use the `facet_wrap()` 
-function to create a multi-paneled plot:
+Once we have created our RasterStack, we can visualize our data. We can use the
+`ggplot()` command to create a multi-panelled plot showing each band in our
+RasterStack. With `tidyterra`, we can plot multi-band rasters directly using
+`facet_wrap()`:
 
 
 ``` r
 ggplot() +
-  geom_raster(data = ndvi_harv_stack_df , aes(x = x, y = y, fill = value)) +
-  facet_wrap(~ variable)
+  geom_spatraster(data = ndvi_harv_stack) +
+  facet_wrap(~ lyr, ncol = 3) +
+  scale_fill_viridis_c(na.value = "transparent") +
+  coord_sf()
 ```
 
 <img src="fig/12-time-series-raster-rendered-ndvi-wrap-1.png" alt="" style="display: block; margin: auto;" />
@@ -265,17 +255,16 @@ quickly apply this factor using raster math on the entire stack as follows:
 ndvi_harv_stack <- ndvi_harv_stack/10000
 ```
 
-After applying our scale factor, we can recreate our plot using the same code 
+After applying our scale factor, we can recreate our plot using the same code
 we used above.
 
 
 ``` r
-ndvi_harv_stack_df <- as.data.frame(ndvi_harv_stack, xy = TRUE) %>%
-    pivot_longer(-(x:y), names_to = "variable", values_to = "value")
-
 ggplot() +
-  geom_raster(data = ndvi_harv_stack_df , aes(x = x, y = y, fill = value)) +
-  facet_wrap(~variable)
+  geom_spatraster(data = ndvi_harv_stack) +
+  facet_wrap(~ lyr, ncol = 3) +
+  scale_fill_viridis_c(na.value = "transparent") +
+  coord_sf()
 ```
 
 <img src="fig/12-time-series-raster-rendered-ndvi-stack-wrap-1.png" alt="" style="display: block; margin: auto;" />
@@ -302,13 +291,16 @@ few images seem to be unusually light. However this was only a visual
 representation of potential issues in our data. What is another way we can look
 at these data that is quantitative?
 
-Next we will use histograms to explore the distribution of NDVI values stored 
-in each raster.
+Next we will use histograms to explore the distribution of NDVI values stored
+in each raster. For this, we'll convert our data to long format:
 
 
 ``` r
+ndvi_harv_stack_df <- as.data.frame(ndvi_harv_stack, xy = TRUE) %>%
+    pivot_longer(-(x:y), names_to = "variable", values_to = "value")
+
 ggplot(ndvi_harv_stack_df) +
-  geom_histogram(aes(value)) + 
+  geom_histogram(aes(value)) +
   facet_wrap(~variable)
 ```
 
