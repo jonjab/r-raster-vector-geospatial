@@ -253,8 +253,8 @@ Next we will use histograms to explore the distribution of NDVI values stored
 in each raster. For this, we'll convert our data to long format:
 
 ```{r view-stack-histogram}
-ndvi_harv_stack_df <- as.data.frame(ndvi_harv_stack, xy = TRUE) %>%
-    pivot_longer(-(x:y), names_to = "variable", values_to = "value")
+ndvi_harv_stack_df <- as.data.frame(ndvi_harv_stack) %>%
+    pivot_longer(everything(), names_to = "variable", values_to = "value")
 
 ggplot(ndvi_harv_stack_df) +
   geom_histogram(aes(value)) +
@@ -324,74 +324,14 @@ outlier NDVI values.
 # Plot RGB data for Julian day 133
 rgb_133 <- rast("data/NEON-DS-Landsat-NDVI/HARV/2011/RGB/133_HARV_landRGB.tif")
 
-# NOTE: Fix the bands' names so they don't start with a number!
-names(rgb_133) <- paste0("X", names(rgb_133))
-
-quantiles = c(0.02, 0.98)
-r <- stats::quantile(values(rgb_133$X133_HARV_landRGB_1), quantiles, 
-                     na.rm = TRUE)
-g <- stats::quantile(values(rgb_133$X133_HARV_landRGB_2), quantiles, 
-                     na.rm = TRUE)
-b <- stats::quantile(values(rgb_133$X133_HARV_landRGB_3), quantiles, 
-                     na.rm = TRUE)
-rgb_133_df <- as.data.frame(rgb_133, xy = TRUE) %>%
-  mutate(tempR = (X133_HARV_landRGB_1 - r[1])/(r[2] - r[1]),
-         tempG = (X133_HARV_landRGB_2 - g[1])/(g[2] - g[1]),
-         tempB = (X133_HARV_landRGB_3 - b[1])/(b[2] - b[1]),
-         tempR = case_when(
-             tempR < 0 ~ 0,
-             tempR > 1 ~ 1,
-             TRUE ~ tempR),
-         tempG = case_when(
-             tempG < 0 ~ 0,
-             tempG > 1 ~ 1,
-             TRUE ~ tempG),
-         tempB = case_when(
-             tempB < 0 ~ 0,
-             tempB > 1 ~ 1,
-             TRUE ~ tempB),
-         rgb = rgb(tempR,tempG,tempB)
-           ) %>%
-    dplyr::select(-(tempR:tempB))
-
-ggplot() +
-  geom_raster(data = rgb_133_df, aes(x, y), fill = rgb_133_df$rgb) + 
-  ggtitle("Julian day 133")
+plotRGB(rgb_133, r = 1, g = 2, b = 3, stretch = "lin")
+title("Julian day 133")
 
 # Plot RGB data for Julian day 197
 RGB_197 <- rast("data/NEON-DS-Landsat-NDVI/HARV/2011/RGB/197_HARV_landRGB.tif")
 
-# NOTE: Fix the bands' names so they don't start with a number!
-names(RGB_197) <- paste0("X", names(RGB_197))
-
-RGB_197 <- RGB_197/255
-r <- quantile(values(RGB_197$X197_HARV_landRGB_1), quantiles, na.rm = TRUE)
-g <- quantile(values(RGB_197$X197_HARV_landRGB_2), quantiles, na.rm = TRUE)
-b <- quantile(values(RGB_197$X197_HARV_landRGB_3), quantiles, na.rm = TRUE)
-
-RGB_197_df <- as.data.frame(RGB_197, xy = TRUE) %>%
-    mutate(tempR = (X197_HARV_landRGB_1 - r[1])/(r[2] - r[1]),
-           tempR = case_when(
-             tempR < 0 ~ 0,
-             tempR > 1 ~ 1,
-             TRUE ~ tempR),
-           tempG = (X197_HARV_landRGB_2 - g[1])/(g[2] - g[1]),
-           tempG = case_when(
-             tempG < 0 ~ 0,
-             tempG > 1 ~ 1,
-             TRUE ~ tempG),
-           tempB = (X197_HARV_landRGB_3 - b[1])/(b[2] - b[1]),
-           tempB = case_when(
-             tempB < 0 ~ 0,
-             tempB > 1 ~ 1,
-             TRUE ~ tempB),
-           rgb = rgb(tempR,tempG,tempB)
-           ) %>%
-    dplyr::select(-(tempR:tempB)) # remove the temporary variables we created.
-
-ggplot() +
-  geom_raster(data = RGB_197_df, aes(x, y), fill = RGB_197_df$rgb) + 
-  ggtitle("Julian day 197")
+plotRGB(RGB_197, r = 1, g = 2, b = 3, stretch = "lin")
+title("Julian day 197")
 ```
 
 :::::::::::::::::::::::::::::::::::::::  challenge
@@ -406,45 +346,13 @@ these two days explain the low NDVI values observed on these days?
 
 ## Answers
 
-First we need to load in the RGB data for Julian day 277 and look at its 
-metadata.
-
-```{r}
-rgb_277 <- rast("data/NEON-DS-Landsat-NDVI/HARV/2011/RGB/277_HARV_landRGB.tif")
-
-# NOTE: Fix the bands' names so they don't start with a number!
-names(rgb_277) <- paste0("X", names(rgb_277))
-
-rgb_277
-```
-
-The RGB data has a max value of 255, but we need our color intensity to be 
-between 0 and 1, so we will divide our RasterStack object by 255.
-
-```{r}
-rgb_277 <- rgb_277/255
-```
-
-Next we convert it to a dataframe.
-
-```{r}
-rgb_277_df <- as.data.frame(rgb_277, xy = TRUE)
-```
-
-We create RGB colors from the three channels:
-
-```{r}
-rgb_277_df$rgb <- 
-  with(rgb_277_df, rgb(X277_HARV_landRGB_1, X277_HARV_landRGB_2, 
-                       X277_HARV_landRGB_3, 1))
-```
-
-Finally, we can plot the RGB data for Julian day 277.
+We can plot the RGB data for Julian day 277.
 
 ```{r rgb-277}
-ggplot() +
-  geom_raster(data=rgb_277_df, aes(x, y), fill=rgb_277_df$rgb) + 
-  ggtitle("Julian day 277") 
+rgb_277 <- rast("data/NEON-DS-Landsat-NDVI/HARV/2011/RGB/277_HARV_landRGB.tif")
+
+plotRGB(rgb_277, r = 1, g = 2, b = 3)
+title("Julian day 277")
 ```
 
 We then do the same steps for Julian day 293
@@ -452,15 +360,9 @@ We then do the same steps for Julian day 293
 ```{r rgb-293}
 # Julian day 293
 rgb_293 <- rast("data/NEON-DS-Landsat-NDVI/HARV/2011/RGB/293_HARV_landRGB.tif")
-names(rgb_293) <- paste0("X", names(rgb_293))
-rgb_293 <- rgb_293/255
-rgb_293_df <- as.data.frame(rgb_293, xy = TRUE)
-rgb_293_df$rgb <- 
-  with(rgb_293_df, rgb(X293_HARV_landRGB_1, X293_HARV_landRGB_2, 
-                       X293_HARV_landRGB_3,1))
-ggplot() +
-  geom_raster(data = rgb_293_df, aes(x, y), fill = rgb_293_df$rgb) +
-  ggtitle("Julian day 293")
+
+plotRGB(rgb_293, r = 1, g = 2, b = 3)
+title("Julian day 293")
 ```
 
 This example highlights the importance of exploring the source of a derived 

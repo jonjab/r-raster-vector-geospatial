@@ -32,6 +32,7 @@ knitr::opts_chunk$set(fig.height = 6)
 library(terra)
 library(ggplot2)
 library(dplyr)
+library(tidyterra)
 ```
 
 ::::::::::::::::::::::::::::::::::::::::::  prereq
@@ -65,6 +66,7 @@ loaded.
 library(terra)
 library(ggplot2)
 library(dplyr)
+library(tidyterra)
 ```
 
 :::::::::::::::::::::::::::::::::::::::::  callout
@@ -150,35 +152,18 @@ the function `values`:
 summary(values(dsm_harv))
 ```
 
-To visualise this data in R using `ggplot2`, we need to convert it to a
-dataframe. We learned about dataframes in [an earlier
-lesson](https://datacarpentry.org/r-intro-geospatial/04-data-structures-part2).
-The `terra` package has an built-in function for conversion to a plotable dataframe.
-
-```{r}
-dsm_harv_df <- as.data.frame(dsm_harv, xy = TRUE)
-```
-
-Now when we view the structure of our data, we will see a standard
-dataframe format.
-
-```{r}
-str(dsm_harv_df)
-```
-
-We can use `ggplot()` to plot this data. We will set the color scale to 
-`scale_fill_viridis_c` which is a color-blindness friendly color scale. We will 
-also use the `coord_quickmap()` function to use an approximate Mercator 
-projection for our plots. This approximation is suitable for small areas that 
-are not too close to the poles. Other coordinate systems are available in 
-ggplot2 if needed, you can learn about them at their help page `?coord_map`.
+We can use `ggplot()` to plot this data using the `tidyterra` package, which
+allows us to plot raster data directly without converting to a dataframe. We
+will set the color scale to `scale_fill_viridis_c` which is a color-blindness
+friendly color scale. We will also use the `coord_sf()` function to handle the
+coordinate system properly.
 
 ```{r ggplot-raster, fig.cap="Raster plot with ggplot2 using the viridis color scale"}
 
 ggplot() +
-    geom_raster(data = dsm_harv_df , aes(x = x, y = y, fill = HARV_dsmCrop)) +
+    geom_spatraster(data = dsm_harv) +
     scale_fill_viridis_c() +
-    coord_quickmap()
+    coord_sf()
 ```
 
 ::::::::::::::::  callout
@@ -360,21 +345,19 @@ rgb_stack <-
 
 # aggregate cells from 0.25m to 2m for plotting to speed up the lesson and
 # save memory
-RGB_2m <- raster::aggregate(rgb_stack, fact = 8, fun = median)
+RGB_2m <- aggregate(rgb_stack, fact = 8, fun = median)
 # fix data values back to integer datatype
 values(RGB_2m) <- as.integer(round(values(RGB_2m)))
 
-# convert to a df for plotting using raster's built-in method
-RGB_2m_df  <- as.data.frame(RGB_2m, xy = TRUE)
-# make colnames easy to ref
-names(RGB_2m_df) <- c('x', 'y', 'red', 'green', 'blue')
+# Extract just the red band for plotting
+red_band <- RGB_2m[[1]]
+names(red_band) <- "red"
 
 ggplot() +
- geom_raster(data = RGB_2m_df , aes(x = x, y = y, fill = red),
-             show.legend = FALSE) +
+  geom_spatraster(data = red_band, show.legend = FALSE) +
   scale_fill_gradient(low = 'black', high = "red") +
   ggtitle("Orthographic Imagery", subtitle = 'Red Band') +
-  coord_quickmap()
+  coord_sf()
 ```
 
 In the next image, the black edges have been assigned `NoDataValue`. R doesn't
@@ -386,19 +369,9 @@ spaces where there is no data.
 
 ```{r demonstrate-no-data-ggplot, echo=FALSE, warning=FALSE}
 # demonstration code - not being taught
-RGB_2m_df_nd <- RGB_2m_df
-# convert the three rgb values to hex codes
-RGB_2m_df_nd$hex <- rgb(RGB_2m_df_nd$red,
-                        RGB_2m_df_nd$green,
-                        RGB_2m_df_nd$blue, maxColorValue = 255)
-# set black hex code to NA
-RGB_2m_df_nd$hex[RGB_2m_df_nd$hex == '#000000'] <- NA_character_
-
-ggplot() +
-  geom_raster(data = RGB_2m_df_nd, aes(x = x, y = y, fill = hex)) +
-  scale_fill_identity() +
-  ggtitle("Orthographic Imagery", subtitle = "All bands") +
-  coord_quickmap()
+# Use plotRGB to display the RGB image
+plotRGB(RGB_2m, r = 1, g = 2, b = 3)
+title(main = "Orthographic Imagery", sub = "All bands")
 
 ```
 
@@ -414,22 +387,24 @@ a colour instruction for `NA` values, like `scale_fill_viridis_c(na.value = 'dee
 ```{r, echo=FALSE}
 # demonstration code
 # function to replace 0 with NA where all three values are 0 only
-RGB_2m_nas <- app(RGB_2m, 
+RGB_2m_nas <- app(RGB_2m,
                   fun = function(x) {
                     if (sum(x == 0, na.rm = TRUE) == length(x))
                        return(rep(NA, times = length(x)))
                     x
                   })
-RGB_2m_nas <- as.data.frame(RGB_2m_nas, xy = TRUE, na.rm = FALSE)
+
+# Extract blue band
+blue_band_nas <- RGB_2m_nas[[3]]
 
 ggplot() +
-  geom_raster(data = RGB_2m_nas, aes(x = x, y = y, fill = HARV_RGB_Ortho_3)) +
+  geom_spatraster(data = blue_band_nas) +
   scale_fill_gradient(low = 'grey90', high = 'blue', na.value = 'deeppink') +
   ggtitle("Orthographic Imagery", subtitle = "Blue band, with NA highlighted") +
-  coord_quickmap()
+  coord_sf()
 
 # memory saving
-rm(RGB_2m, rgb_stack, RGB_2m_df_nd, RGB_2m_df, RGB_2m_nas)
+rm(RGB_2m, rgb_stack, red_band, RGB_2m_nas, blue_band_nas)
 ```
 
 The value that is conventionally used to take note of missing data (the
@@ -500,22 +475,17 @@ elevation values over 400m with a contrasting colour.
 
 ```{r demo-bad-data-highlighting, echo=FALSE, message=FALSE, warning=FALSE}
 # reclassify raster to ok/not ok
-dsm_high <- classify(dsm_harv, 
-                         rcl = matrix(c(0, 400, NA_integer_, 400, 420, 1L), 
-                                      ncol = 3, byrow = TRUE), 
+dsm_high <- classify(dsm_harv,
+                         rcl = matrix(c(0, 400, 1, 400, 420, 2),
+                                      ncol = 3, byrow = TRUE),
                          include.lowest = TRUE)
-dsm_high <- as.data.frame(dsm_high, xy = TRUE)
-
-dsm_high <- dsm_high[!is.na(dsm_high$HARV_dsmCrop), ]
 
 ggplot() +
-  geom_raster(data = dsm_harv_df, aes(x = x, y = y, fill = HARV_dsmCrop)) +
+  geom_spatraster(data = dsm_harv) +
   scale_fill_viridis_c() +
-  # use reclassified raster data as an annotation
-  annotate(geom = 'raster', x = dsm_high$x, y = dsm_high$y, 
-           fill = scales::colour_ramp('deeppink')(dsm_high$HARV_dsmCrop)) +
+  geom_spatraster(data = dsm_high, fill = "deeppink", alpha = 0.5) +
   ggtitle("Elevation Data", subtitle = "Highlighting values > 400m") +
-  coord_quickmap()
+  coord_sf()
 
 # memory saving
 rm(dsm_high)
@@ -530,7 +500,7 @@ useful in identifying outliers and bad data values in our raster data.
 ```{r view-raster-histogram}
 
 ggplot() +
-    geom_histogram(data = dsm_harv_df, aes(HARV_dsmCrop))
+    geom_histogram(data = dsm_harv, aes(x = HARV_dsmCrop))
 
 ```
 
@@ -544,7 +514,7 @@ by using the `bins` value in the `geom_histogram()` function.
 
 ```{r view-raster-histogram2}
 ggplot() +
-    geom_histogram(data = dsm_harv_df, aes(HARV_dsmCrop), bins = 40)
+    geom_histogram(data = dsm_harv, aes(x = HARV_dsmCrop), bins = 40)
 
 ```
 

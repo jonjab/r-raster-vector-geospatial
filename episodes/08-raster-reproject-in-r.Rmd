@@ -26,6 +26,7 @@ source("setup.R")
 library(terra)
 library(ggplot2)
 library(dplyr)
+library(tidyterra)
 ```
 
 ::::::::::::::::::::::::::::::::::::::::::  prereq
@@ -36,7 +37,7 @@ See the [lesson homepage](.) for detailed information about the software,
 data, and other prerequisites you will need to work through the examples in 
 this episode.
 
-We will be using only 3 libraries: `dplyr`, `ggplot2`, and `terra` in this episode.
+We will be using only 4 libraries: `dplyr`, `ggplot2`, `tidyterra`, and `terra` in this episode.
 
 
 
@@ -81,40 +82,26 @@ dtm_hill_harv <-
     rast("data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_DTMhill_WGS84.tif")
 ```
 
-Next, we will convert each of these datasets to a dataframe for
-plotting with `ggplot`.
-
-```{r}
-dtm_harv_df <- as.data.frame(dtm_harv, xy = TRUE)
-
-dtm_hill_harv_df <- as.data.frame(dtm_hill_harv, xy = TRUE)
-```
-
 Now we can create a map of the DTM layered over the hillshade.
 
 ```{r}
 ggplot() +
-     geom_raster(data = dtm_harv_df , 
-                 aes(x = x, y = y, 
-                  fill = HARV_dtmCrop)) + 
-     geom_raster(data = dtm_hill_harv_df, 
-                 aes(x = x, y = y, 
-                   alpha = HARV_DTMhill_WGS84)) +
-     scale_fill_gradientn(name = "Elevation", colors = terrain.colors(10)) + 
-     coord_quickmap()
+     geom_spatraster(data = dtm_hill_harv, aes(alpha = HARV_DTMhill_WGS84)) +
+     scale_alpha(range = c(0.15, 0.65), guide = "none") +
+     geom_spatraster(data = dtm_harv) +
+     scale_fill_gradientn(name = "Elevation", colors = terrain.colors(10)) +
+     coord_sf()
 ```
 
-Our results are curious - neither the Digital Terrain Model (`dtm_harv_df`)
-nor the DTM Hillshade (`dtm_hill_harv_df`) plotted.
+Our results are curious - neither the Digital Terrain Model (`dtm_harv`)
+nor the DTM Hillshade (`dtm_hill_harv`) plotted.
 Let's try to plot the DTM on its own to make sure there are data there.
 
 ```{r plot-DTM}
 ggplot() +
-geom_raster(data = dtm_harv_df,
-    aes(x = x, y = y,
-    fill = HARV_dtmCrop)) +
-scale_fill_gradientn(name = "Elevation", colors = terrain.colors(10)) + 
-coord_quickmap()
+  geom_spatraster(data = dtm_harv) +
+  scale_fill_gradientn(name = "Elevation", colors = terrain.colors(10)) +
+  coord_sf()
 ```
 
 Our DTM seems to contain data and plots just fine.
@@ -123,10 +110,9 @@ Next we plot the DTM Hillshade on its own to see whether everything is OK.
 
 ```{r plot-DTM-hill}
 ggplot() +
-geom_raster(data = dtm_hill_harv_df,
-    aes(x = x, y = y,
-    alpha = HARV_DTMhill_WGS84)) + 
-    coord_quickmap()
+  geom_spatraster(data = dtm_hill_harv, aes(alpha = HARV_DTMhill_WGS84)) +
+  scale_alpha(range = c(0.15, 0.65), guide = "none") +
+  coord_sf()
 ```
 
 If we look at the axes, we can see that the projections of the two rasters are 
@@ -276,25 +262,15 @@ res(dtm_hill_utm_harv)
 res(dtm_harv)
 ```
 
-For plotting with `ggplot()`, we will need to create a dataframe from our newly 
-reprojected raster.
-
-```{r make-df-projected-raster}
-dtm_hill_utm_harv_df <- as.data.frame(dtm_hill_utm_harv, xy = TRUE)
-```
-
 We can now create a plot of this data.
 
 ```{r plot-projected-raster}
 ggplot() +
-     geom_raster(data = dtm_harv_df , 
-                 aes(x = x, y = y, 
-                  fill = HARV_dtmCrop)) + 
-     geom_raster(data = dtm_hill_utm_harv_df, 
-                 aes(x = x, y = y, 
-                   alpha = HARV_DTMhill_WGS84)) +
-     scale_fill_gradientn(name = "Elevation", colors = terrain.colors(10)) + 
-     coord_quickmap()
+     geom_spatraster(data = dtm_hill_utm_harv, aes(alpha = HARV_DTMhill_WGS84)) +
+     scale_alpha(range = c(0.15, 0.65), guide = "none") +
+     geom_spatraster(data = dtm_harv) +
+     scale_fill_gradientn(name = "Elevation", colors = terrain.colors(10)) +
+     coord_sf()
 ```
 
 We have now successfully draped the Digital Terrain Model on top of our
@@ -327,23 +303,12 @@ dsm_hill_utm_sjer <- project(dsm_hill_wgs_sjer,
                                  crs(dsm_sjer),
                                  res = 1)
 
-# convert to data.frames
-dsm_sjer_df <- as.data.frame(dsm_sjer, xy = TRUE)
-
-dsm_hill_sjer_df <- as.data.frame(dsm_hill_utm_sjer, xy = TRUE)
-
 ggplot() +
-     geom_raster(data = dsm_hill_sjer_df, 
-                 aes(x = x, y = y, 
-                   alpha = SJER_DSMhill_WGS84)
-                 ) +
-     geom_raster(data = dsm_sjer_df, 
-             aes(x = x, y = y, 
-                  fill = SJER_dsmCrop,
-                  alpha=0.8)
-             ) + 
-     scale_fill_gradientn(name = "Elevation", colors = terrain.colors(10)) + 
-     coord_quickmap()
+     geom_spatraster(data = dsm_hill_utm_sjer, aes(alpha = SJER_DSMhill_WGS84)) +
+     scale_alpha(range = c(0.15, 0.65), guide = "none") +
+     geom_spatraster(data = dsm_sjer, alpha = 0.8) +
+     scale_fill_gradientn(name = "Elevation", colors = terrain.colors(10)) +
+     coord_sf()
 ```
 
 :::::::::::::::::::::::::
@@ -403,17 +368,11 @@ dtm_hill_harv_wgs <-
 # Reproject DTM hillshade to match DTM
 dtm_hill_harv <- project(dtm_hill_harv_wgs, crs(dtm_harv), res = 1)
 
-# Convert to data frames for ggplot
-dtm_harv_df <- as.data.frame(dtm_harv, xy = TRUE)
-dtm_hill_harv_df <- as.data.frame(dtm_hill_harv, xy = TRUE)
-
 # Create plot
 ggplot() +
-  geom_raster(data = dtm_hill_harv_df,
-              aes(x = x, y = y, alpha = HARV_DTMhill_WGS84)) +
+  geom_spatraster(data = dtm_hill_harv, aes(alpha = HARV_DTMhill_WGS84)) +
   scale_alpha(range = c(0.15, 0.65), guide = "none") +
-  geom_raster(data = dtm_harv_df,
-              aes(x = x, y = y, fill = HARV_dtmCrop), alpha = 0.7) +
+  geom_spatraster(data = dtm_harv, alpha = 0.7) +
   scale_fill_viridis_c() +
   geom_spatvector(data = lines_harv, color = "black") +
   geom_spatvector(data = aoi_boundary_harv, color = "grey20", linewidth = 1.5,
