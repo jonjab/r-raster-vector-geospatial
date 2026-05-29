@@ -16,8 +16,6 @@
 
 - [Ivo Arrey][arreyves]
 - [Jon Jablonski][jonjab]
-- [Braden Owsley][owsleybc]
 
 [arreyves]: https://carpentries.org/instructors/#arreyves
 [jonjab]: https://carpentries.org/instructors/#jonjab
-[owsleybc]: https://carpentries.org/instructors/#owsleybc
