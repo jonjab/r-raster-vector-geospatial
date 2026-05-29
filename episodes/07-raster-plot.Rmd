@@ -29,15 +29,14 @@ source("setup.R")
 library(terra)
 library(ggplot2)
 library(dplyr)
+library(tidyterra)
 ```
 
 ```{r load-data, echo=FALSE}
 # Learners will have this data loaded from earlier episode
 # DSM data for Harvard Forest
-dsm_harv <- 
+dsm_harv <-
   rast("data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif")
-
-dsm_harv_df <- as.data.frame(dsm_harv, xy = TRUE)
 ```
 
 ::::::::::::::::::::::::::::::::::::::::::  prereq
@@ -47,9 +46,9 @@ dsm_harv_df <- as.data.frame(dsm_harv, xy = TRUE)
 See the [lesson homepage](.) for detailed information about the software,
 data, and other prerequisites you will need to work through the examples in this episode.
 
-We will be using `dplyr`, `ggplot2`, and `terra` in this episode.
+We will be using `dplyr`, `ggplot2`, `tidyterra`, and `terra` in this episode.
 
-Make sure you have the `dsm_harv` and `dsm_harv_df` created.
+Make sure you have the `dsm_harv` object created.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -74,25 +73,27 @@ data into 3 bins.
 
 ```{r histogram-breaks-ggplot}
 
-dsm_harv_df <- dsm_harv_df %>%
-                mutate(fct_elevation = cut(HARV_dsmCrop, breaks = 3))
+# Convert raster values to a vector for categorization
+dsm_values <- values(dsm_harv, mat = FALSE)
+dsm_categories <- cut(dsm_values, breaks = 3)
+dsm_cat_df <- data.frame(fct_elevation = dsm_categories)
 
 ggplot() +
-    geom_bar(data = dsm_harv_df, aes(fct_elevation))
+    geom_bar(data = dsm_cat_df, aes(fct_elevation))
 
 ```
 
-If we want to know the cutoff values for the groups, we can ask for the unique 
+If we want to know the cutoff values for the groups, we can ask for the unique
 values of `fct_elevation`:
 
 ```{r unique-breaks}
-unique(dsm_harv_df$fct_elevation)
+unique(dsm_cat_df$fct_elevation)
 ```
 
 And we can get the count of values in each group using `dplyr`'s `count()` function:
 
 ```{r breaks-count}
-dsm_harv_df %>%
+dsm_cat_df %>%
         count(fct_elevation)
 ```
 
@@ -105,10 +106,10 @@ instead of the number of breaks we want.
 ```{r custom-bins}
 custom_bins <- c(300, 350, 400, 450)
 
-dsm_harv_df <- dsm_harv_df %>%
-  mutate(fct_elevation_2 = cut(HARV_dsmCrop, breaks = custom_bins))
+# Also create factor version for bar plots
+dsm_cat_df_2 <- data.frame(fct_elevation_2 = cut(dsm_values, breaks = custom_bins))
 
-unique(dsm_harv_df$fct_elevation_2)
+unique(dsm_cat_df_2$fct_elevation_2)
 ```
 
 :::::::::::::::::::::::::::::::::::::::::  callout
@@ -128,23 +129,31 @@ And now we can plot our bar plot again, using the new groups:
 
 ```{r histogram-custom-breaks}
 ggplot() +
-  geom_bar(data = dsm_harv_df, aes(fct_elevation_2))
+  geom_bar(data = dsm_cat_df_2, aes(fct_elevation_2))
 ```
 
 And we can get the count of values in each group in the same way we did before:
 
 ```{r break-count-custom}
-dsm_harv_df %>%
+dsm_cat_df_2 %>%
   count(fct_elevation_2)
 ```
 
-We can use those groups to plot our raster data, with each group being a 
+We can use those groups to plot our raster data, with each group being a
 different color:
 
 ```{r raster-with-breaks}
+# Create a reclassified raster with custom bins
+rcl_matrix <- matrix(c(300, 350, 1,
+                       350, 400, 2,
+                       400, 450, 3),
+                     ncol = 3, byrow = TRUE)
+dsm_harv_classified <- classify(dsm_harv, rcl_matrix, include.lowest = TRUE)
+
 ggplot() +
-  geom_raster(data = dsm_harv_df , aes(x = x, y = y, fill = fct_elevation_2)) + 
-  coord_quickmap()
+  geom_spatraster(data = dsm_harv_classified) +
+  scale_fill_gradientn(colors = terrain.colors(3)) +
+  coord_sf()
 ```
 
 The plot above uses the default colors inside `ggplot` for raster objects.
@@ -166,10 +175,9 @@ To use these in our map, we pass them across using the
 ```{r ggplot-breaks-customcolors}
 
 ggplot() +
- geom_raster(data = dsm_harv_df , aes(x = x, y = y,
-                                      fill = fct_elevation_2)) + 
-    scale_fill_manual(values = terrain.colors(3)) + 
-    coord_quickmap()
+  geom_spatraster(data = dsm_harv_classified) +
+  scale_fill_gradientn(colors = terrain.colors(3), name = "Elevation") +
+  coord_sf()
 ```
 
 ### More Plot Formatting
@@ -189,13 +197,11 @@ the relevant part of the `theme()` function.
 
 my_colors <- terrain.colors(3)
 
-
 ggplot() +
- geom_raster(data = dsm_harv_df , aes(x = x, y = y,
-                                      fill = fct_elevation_2)) + 
-    scale_fill_manual(values = my_colors, name = "Elevation") +
-    theme(axis.title = element_blank()) + 
-    coord_quickmap()
+  geom_spatraster(data = dsm_harv_classified) +
+  scale_fill_gradientn(colors = my_colors, name = "Elevation") +
+  theme(axis.title = element_blank()) +
+  coord_sf()
 ```
 
 :::::::::::::::::::::::::::::::::::::::  challenge
@@ -215,19 +221,25 @@ Create a plot of the Harvard Forest Digital Surface Model (DSM) that has:
 
 ```{r challenge-code-plotting}
 
-dsm_harv_df <- dsm_harv_df  %>%
-               mutate(fct_elevation_6 = cut(HARV_dsmCrop, breaks = 6)) 
+# Create 6-class reclassification
+rcl_matrix_6 <- matrix(c(300, 320, 1,
+                         320, 340, 2,
+                         340, 360, 3,
+                         360, 380, 4,
+                         380, 400, 5,
+                         400, 420, 6),
+                       ncol = 3, byrow = TRUE)
+dsm_harv_classified_6 <- classify(dsm_harv, rcl_matrix_6, include.lowest = TRUE)
 
- my_colors <- terrain.colors(6)
+my_colors <- terrain.colors(6)
 
 ggplot() +
-    geom_raster(data = dsm_harv_df , aes(x = x, y = y,
-                                      fill = fct_elevation_6)) + 
-    scale_fill_manual(values = my_colors, name = "Elevation") + 
+    geom_spatraster(data = dsm_harv_classified_6) +
+    scale_fill_gradientn(colors = my_colors, name = "Elevation") +
     ggtitle("Classified Elevation Map - NEON Harvard Forest Field Site") +
     xlab("UTM Easting Coordinate (m)") +
-    ylab("UTM Northing Coordinate (m)") + 
-    coord_quickmap()
+    ylab("UTM Northing Coordinate (m)") +
+    coord_sf()
 ```
 
 :::::::::::::::::::::::::
@@ -251,22 +263,13 @@ dsm_hill_harv <-
 dsm_hill_harv
 ```
 
-Next we convert it to a dataframe, so that we can plot it using `ggplot2`:
-
-```{r}
-dsm_hill_harv_df <- as.data.frame(dsm_hill_harv, xy = TRUE) 
-
-str(dsm_hill_harv_df)
-```
-
 Now we can plot the hillshade data:
 
 ```{r raster-hillshade}
 ggplot() +
-  geom_raster(data = dsm_hill_harv_df,
-              aes(x = x, y = y, alpha = HARV_DSMhill)) + 
-  scale_alpha(range =  c(0.15, 0.65), guide = "none") + 
-  coord_quickmap()
+  geom_spatraster(data = dsm_hill_harv, aes(alpha = HARV_DSMhill)) +
+  scale_alpha(range =  c(0.15, 0.65), guide = "none") +
+  coord_sf()
 ```
 
 :::::::::::::::::::::::::::::::::::::::::  callout
@@ -290,16 +293,12 @@ Let's not forget to use `ggtitle` to give our outputs some context.
 
 ```{r overlay-hillshade}
 ggplot() +
-  geom_raster(data = dsm_harv_df , 
-              aes(x = x, y = y, 
-                  fill = HARV_dsmCrop)) + 
-  geom_raster(data = dsm_hill_harv_df, 
-              aes(x = x, y = y, 
-                  alpha = HARV_DSMhill)) +  
-  scale_fill_viridis_c() +  
-  scale_alpha(range = c(0.15, 0.65), guide = "none") +  
+  geom_spatraster(data = dsm_hill_harv, aes(alpha = HARV_DSMhill)) +
+  scale_alpha(range = c(0.15, 0.65), guide = "none") +
+  geom_spatraster(data = dsm_harv) +
+  scale_fill_viridis_c() +
   ggtitle("Elevation with hillshade") +
-  coord_quickmap()
+  coord_sf()
 ```
 
 :::::::::::::::::::::::::::::::::::::::  challenge
@@ -326,71 +325,51 @@ Make sure to:
 # CREATE DSM MAPS
 
 # import DSM data
-dsm_sjer <- 
+dsm_sjer <-
   rast("data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_dsmCrop.tif")
-# convert to a df for plotting
-dsm_sjer_df <- as.data.frame(dsm_sjer, xy = TRUE)
 
 # import DSM hillshade
-dsm_hill_sjer <- 
+dsm_hill_sjer <-
   rast("data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_dsmHill.tif")
-# convert to a df for plotting
-dsm_hill_sjer_df <- as.data.frame(dsm_hill_sjer, xy = TRUE)
 
 # Build Plot
 ggplot() +
-    geom_raster(data = dsm_sjer_df , 
-                aes(x = x, y = y, 
-                     fill = SJER_dsmCrop,
-                     alpha = 0.8)
-                ) + 
-    geom_raster(data = dsm_hill_sjer_df, 
-                aes(x = x, y = y, 
-                  alpha = SJER_dsmHill)
-                ) +
+    geom_spatraster(data = dsm_hill_sjer, aes(alpha = SJER_dsmHill)) +
+    scale_alpha(range = c(0.4, 0.7), guide = "none") +
+    geom_spatraster(data = dsm_sjer) +
     scale_fill_viridis_c() +
     guides(fill = guide_colorbar()) +
-    scale_alpha(range = c(0.4, 0.7), guide = "none") +
     # remove grey background and grid lines
-    theme_bw() + 
-    theme(panel.grid.major = element_blank(), 
+    theme_bw() +
+    theme(panel.grid.major = element_blank(),
           panel.grid.minor = element_blank()) +
     xlab("UTM Easting Coordinate (m)") +
     ylab("UTM Northing Coordinate (m)") +
     ggtitle("DSM with Hillshade") +
-    coord_quickmap()
+    coord_sf()
 
 # CREATE DTM MAP
 # import DTM
-dtm_sjer <- 
+dtm_sjer <-
   rast("data/NEON-DS-Airborne-Remote-Sensing/SJER/DTM/SJER_dtmCrop.tif")
-dtm_sjer_df <- as.data.frame(dtm_sjer, xy = TRUE)
 
 # DTM Hillshade
-dtm_hill_sjer <- 
+dtm_hill_sjer <-
   rast("data/NEON-DS-Airborne-Remote-Sensing/SJER/DTM/SJER_dtmHill.tif")
-dtm_hill_sjer_df <- as.data.frame(dtm_hill_sjer, xy = TRUE)
 
 ggplot() +
-    geom_raster(data = dtm_sjer_df ,
-                aes(x = x, y = y,
-                     fill = SJER_dtmCrop,
-                     alpha = 2.0)
-                ) +
-    geom_raster(data = dtm_hill_sjer_df,
-                aes(x = x, y = y,
-                  alpha = SJER_dtmHill)
-                ) +
+    geom_spatraster(data = dtm_hill_sjer, aes(alpha = SJER_dtmHill)) +
+    scale_alpha(range = c(0.4, 0.7), guide = "none") +
+    geom_spatraster(data = dtm_sjer) +
     scale_fill_viridis_c() +
     guides(fill = guide_colorbar()) +
-    scale_alpha(range = c(0.4, 0.7), guide = "none") +
     theme_bw() +
-    theme(panel.grid.major = element_blank(), 
+    theme(panel.grid.major = element_blank(),
           panel.grid.minor = element_blank()) +
     theme(axis.title.x = element_blank(),
           axis.title.y = element_blank()) +
     ggtitle("DTM with Hillshade") +
-    coord_quickmap()
+    coord_sf()
 ```
 
 :::::::::::::::::::::::::
