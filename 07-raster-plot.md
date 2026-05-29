@@ -34,9 +34,9 @@ source: Rmd
 See the [lesson homepage](.) for detailed information about the software,
 data, and other prerequisites you will need to work through the examples in this episode.
 
-We will be using `dplyr`, `ggplot2`, and `terra` in this episode.
+We will be using `dplyr`, `ggplot2`, `tidyterra`, and `terra` in this episode.
 
-Make sure you have the `dsm_harv` and `dsm_harv_df` created.
+Make sure you have the `dsm_harv` object created.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -61,21 +61,23 @@ data into 3 bins.
 
 
 ``` r
-dsm_harv_df <- dsm_harv_df %>%
-                mutate(fct_elevation = cut(HARV_dsmCrop, breaks = 3))
+# Convert raster values to a vector for categorization
+dsm_values <- values(dsm_harv, mat = FALSE)
+dsm_categories <- cut(dsm_values, breaks = 3)
+dsm_cat_df <- data.frame(fct_elevation = dsm_categories)
 
 ggplot() +
-    geom_bar(data = dsm_harv_df, aes(fct_elevation))
+    geom_bar(data = dsm_cat_df, aes(fct_elevation))
 ```
 
 <img src="fig/07-raster-plot-rendered-histogram-breaks-ggplot-1.png" alt="" style="display: block; margin: auto;" />
 
-If we want to know the cutoff values for the groups, we can ask for the unique 
+If we want to know the cutoff values for the groups, we can ask for the unique
 values of `fct_elevation`:
 
 
 ``` r
-unique(dsm_harv_df$fct_elevation)
+unique(dsm_cat_df$fct_elevation)
 ```
 
 ``` output
@@ -87,7 +89,7 @@ And we can get the count of values in each group using `dplyr`'s `count()` funct
 
 
 ``` r
-dsm_harv_df %>%
+dsm_cat_df %>%
         count(fct_elevation)
 ```
 
@@ -108,10 +110,10 @@ instead of the number of breaks we want.
 ``` r
 custom_bins <- c(300, 350, 400, 450)
 
-dsm_harv_df <- dsm_harv_df %>%
-  mutate(fct_elevation_2 = cut(HARV_dsmCrop, breaks = custom_bins))
+# Also create factor version for bar plots
+dsm_cat_df_2 <- data.frame(fct_elevation_2 = cut(dsm_values, breaks = custom_bins))
 
-unique(dsm_harv_df$fct_elevation_2)
+unique(dsm_cat_df_2$fct_elevation_2)
 ```
 
 ``` output
@@ -137,7 +139,7 @@ And now we can plot our bar plot again, using the new groups:
 
 ``` r
 ggplot() +
-  geom_bar(data = dsm_harv_df, aes(fct_elevation_2))
+  geom_bar(data = dsm_cat_df_2, aes(fct_elevation_2))
 ```
 
 <img src="fig/07-raster-plot-rendered-histogram-custom-breaks-1.png" alt="" style="display: block; margin: auto;" />
@@ -146,7 +148,7 @@ And we can get the count of values in each group in the same way we did before:
 
 
 ``` r
-dsm_harv_df %>%
+dsm_cat_df_2 %>%
   count(fct_elevation_2)
 ```
 
@@ -157,14 +159,26 @@ dsm_harv_df %>%
 3       (400,450]   10668
 ```
 
-We can use those groups to plot our raster data, with each group being a 
+We can use those groups to plot our raster data, with each group being a
 different color:
 
 
 ``` r
+# Create a reclassified raster with custom bins
+rcl_matrix <- matrix(c(300, 350, 1,
+                       350, 400, 2,
+                       400, 450, 3),
+                     ncol = 3, byrow = TRUE)
+dsm_harv_classified <- classify(dsm_harv, rcl_matrix, include.lowest = TRUE)
+
 ggplot() +
-  geom_raster(data = dsm_harv_df , aes(x = x, y = y, fill = fct_elevation_2)) + 
-  coord_quickmap()
+  geom_spatraster(data = dsm_harv_classified) +
+  scale_fill_gradientn(colors = terrain.colors(3)) +
+  coord_sf()
+```
+
+``` output
+<SpatRaster> resampled to 500380 cells.
 ```
 
 <img src="fig/07-raster-plot-rendered-raster-with-breaks-1.png" alt="" style="display: block; margin: auto;" />
@@ -193,10 +207,13 @@ To use these in our map, we pass them across using the
 
 ``` r
 ggplot() +
- geom_raster(data = dsm_harv_df , aes(x = x, y = y,
-                                      fill = fct_elevation_2)) + 
-    scale_fill_manual(values = terrain.colors(3)) + 
-    coord_quickmap()
+  geom_spatraster(data = dsm_harv_classified) +
+  scale_fill_gradientn(colors = terrain.colors(3), name = "Elevation") +
+  coord_sf()
+```
+
+``` output
+<SpatRaster> resampled to 500380 cells.
 ```
 
 <img src="fig/07-raster-plot-rendered-ggplot-breaks-customcolors-1.png" alt="" style="display: block; margin: auto;" />
@@ -218,13 +235,15 @@ the relevant part of the `theme()` function.
 ``` r
 my_colors <- terrain.colors(3)
 
-
 ggplot() +
- geom_raster(data = dsm_harv_df , aes(x = x, y = y,
-                                      fill = fct_elevation_2)) + 
-    scale_fill_manual(values = my_colors, name = "Elevation") +
-    theme(axis.title = element_blank()) + 
-    coord_quickmap()
+  geom_spatraster(data = dsm_harv_classified) +
+  scale_fill_gradientn(colors = my_colors, name = "Elevation") +
+  theme(axis.title = element_blank()) +
+  coord_sf()
+```
+
+``` output
+<SpatRaster> resampled to 500380 cells.
 ```
 
 <img src="fig/07-raster-plot-rendered-add-ggplot-labels-1.png" alt="" style="display: block; margin: auto;" />
@@ -246,19 +265,29 @@ Create a plot of the Harvard Forest Digital Surface Model (DSM) that has:
 
 
 ``` r
-dsm_harv_df <- dsm_harv_df  %>%
-               mutate(fct_elevation_6 = cut(HARV_dsmCrop, breaks = 6)) 
+# Create 6-class reclassification
+rcl_matrix_6 <- matrix(c(300, 320, 1,
+                         320, 340, 2,
+                         340, 360, 3,
+                         360, 380, 4,
+                         380, 400, 5,
+                         400, 420, 6),
+                       ncol = 3, byrow = TRUE)
+dsm_harv_classified_6 <- classify(dsm_harv, rcl_matrix_6, include.lowest = TRUE)
 
- my_colors <- terrain.colors(6)
+my_colors <- terrain.colors(6)
 
 ggplot() +
-    geom_raster(data = dsm_harv_df , aes(x = x, y = y,
-                                      fill = fct_elevation_6)) + 
-    scale_fill_manual(values = my_colors, name = "Elevation") + 
+    geom_spatraster(data = dsm_harv_classified_6) +
+    scale_fill_gradientn(colors = my_colors, name = "Elevation") +
     ggtitle("Classified Elevation Map - NEON Harvard Forest Field Site") +
     xlab("UTM Easting Coordinate (m)") +
-    ylab("UTM Northing Coordinate (m)") + 
-    coord_quickmap()
+    ylab("UTM Northing Coordinate (m)") +
+    coord_sf()
+```
+
+``` output
+<SpatRaster> resampled to 500380 cells.
 ```
 
 <img src="fig/07-raster-plot-rendered-challenge-code-plotting-1.png" alt="" style="display: block; margin: auto;" />
@@ -297,34 +326,27 @@ min value   :   -0.7136298
 max value   :    0.9999997 
 ```
 
-Next we convert it to a dataframe, so that we can plot it using `ggplot2`:
-
-
-``` r
-dsm_hill_harv_df <- as.data.frame(dsm_hill_harv, xy = TRUE) 
-
-str(dsm_hill_harv_df)
-```
-
-``` output
-'data.frame':	2313675 obs. of  3 variables:
- $ x           : num  731454 731456 731456 731458 731458 ...
- $ y           : num  4713836 4713836 4713836 4713836 4713836 ...
- $ HARV_DSMhill: num  -0.15567 0.00743 0.86989 0.9791 0.96283 ...
-```
-
 Now we can plot the hillshade data:
 
 
 ``` r
 ggplot() +
-  geom_raster(data = dsm_hill_harv_df,
-              aes(x = x, y = y, alpha = HARV_DSMhill)) + 
-  scale_alpha(range =  c(0.15, 0.65), guide = "none") + 
-  coord_quickmap()
+  geom_spatraster(data = dsm_hill_harv, aes(alpha = HARV_DSMhill)) +
+  scale_alpha(range =  c(0.15, 0.65), guide = "none") +
+  coord_sf()
 ```
 
-<img src="fig/07-raster-plot-rendered-raster-hillshade-1.png" alt="" style="display: block; margin: auto;" />
+``` output
+<SpatRaster> resampled to 500380 cells.
+```
+
+``` error
+Error in `geom_spatraster()`:
+! Problem while computing aesthetics.
+ℹ Error occurred in the 1st layer.
+Caused by error:
+! object 'HARV_DSMhill' not found
+```
 
 :::::::::::::::::::::::::::::::::::::::::  callout
 
@@ -348,19 +370,26 @@ Let's not forget to use `ggtitle` to give our outputs some context.
 
 ``` r
 ggplot() +
-  geom_raster(data = dsm_harv_df , 
-              aes(x = x, y = y, 
-                  fill = HARV_dsmCrop)) + 
-  geom_raster(data = dsm_hill_harv_df, 
-              aes(x = x, y = y, 
-                  alpha = HARV_DSMhill)) +  
-  scale_fill_viridis_c() +  
-  scale_alpha(range = c(0.15, 0.65), guide = "none") +  
+  geom_spatraster(data = dsm_hill_harv, aes(alpha = HARV_DSMhill)) +
+  scale_alpha(range = c(0.15, 0.65), guide = "none") +
+  geom_spatraster(data = dsm_harv) +
+  scale_fill_viridis_c() +
   ggtitle("Elevation with hillshade") +
-  coord_quickmap()
+  coord_sf()
 ```
 
-<img src="fig/07-raster-plot-rendered-overlay-hillshade-1.png" alt="" style="display: block; margin: auto;" />
+``` output
+<SpatRaster> resampled to 500380 cells.
+<SpatRaster> resampled to 500380 cells.
+```
+
+``` error
+Error in `geom_spatraster()`:
+! Problem while computing aesthetics.
+ℹ Error occurred in the 1st layer.
+Caused by error:
+! object 'HARV_DSMhill' not found
+```
 
 :::::::::::::::::::::::::::::::::::::::  challenge
 
@@ -387,78 +416,80 @@ Make sure to:
 # CREATE DSM MAPS
 
 # import DSM data
-dsm_sjer <- 
+dsm_sjer <-
   rast("data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_dsmCrop.tif")
-# convert to a df for plotting
-dsm_sjer_df <- as.data.frame(dsm_sjer, xy = TRUE)
 
 # import DSM hillshade
-dsm_hill_sjer <- 
+dsm_hill_sjer <-
   rast("data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_dsmHill.tif")
-# convert to a df for plotting
-dsm_hill_sjer_df <- as.data.frame(dsm_hill_sjer, xy = TRUE)
 
 # Build Plot
 ggplot() +
-    geom_raster(data = dsm_sjer_df , 
-                aes(x = x, y = y, 
-                     fill = SJER_dsmCrop,
-                     alpha = 0.8)
-                ) + 
-    geom_raster(data = dsm_hill_sjer_df, 
-                aes(x = x, y = y, 
-                  alpha = SJER_dsmHill)
-                ) +
+    geom_spatraster(data = dsm_hill_sjer, aes(alpha = SJER_dsmHill)) +
+    scale_alpha(range = c(0.4, 0.7), guide = "none") +
+    geom_spatraster(data = dsm_sjer) +
     scale_fill_viridis_c() +
     guides(fill = guide_colorbar()) +
-    scale_alpha(range = c(0.4, 0.7), guide = "none") +
     # remove grey background and grid lines
-    theme_bw() + 
-    theme(panel.grid.major = element_blank(), 
+    theme_bw() +
+    theme(panel.grid.major = element_blank(),
           panel.grid.minor = element_blank()) +
     xlab("UTM Easting Coordinate (m)") +
     ylab("UTM Northing Coordinate (m)") +
     ggtitle("DSM with Hillshade") +
-    coord_quickmap()
+    coord_sf()
 ```
 
-<img src="fig/07-raster-plot-rendered-challenge-hillshade-layering-1.png" alt="" style="display: block; margin: auto;" />
+``` output
+<SpatRaster> resampled to 500423 cells.
+<SpatRaster> resampled to 500423 cells.
+```
+
+``` error
+Error in `geom_spatraster()`:
+! Problem while computing aesthetics.
+ℹ Error occurred in the 1st layer.
+Caused by error:
+! object 'SJER_dsmHill' not found
+```
 
 ``` r
 # CREATE DTM MAP
 # import DTM
-dtm_sjer <- 
+dtm_sjer <-
   rast("data/NEON-DS-Airborne-Remote-Sensing/SJER/DTM/SJER_dtmCrop.tif")
-dtm_sjer_df <- as.data.frame(dtm_sjer, xy = TRUE)
 
 # DTM Hillshade
-dtm_hill_sjer <- 
+dtm_hill_sjer <-
   rast("data/NEON-DS-Airborne-Remote-Sensing/SJER/DTM/SJER_dtmHill.tif")
-dtm_hill_sjer_df <- as.data.frame(dtm_hill_sjer, xy = TRUE)
 
 ggplot() +
-    geom_raster(data = dtm_sjer_df ,
-                aes(x = x, y = y,
-                     fill = SJER_dtmCrop,
-                     alpha = 2.0)
-                ) +
-    geom_raster(data = dtm_hill_sjer_df,
-                aes(x = x, y = y,
-                  alpha = SJER_dtmHill)
-                ) +
+    geom_spatraster(data = dtm_hill_sjer, aes(alpha = SJER_dtmHill)) +
+    scale_alpha(range = c(0.4, 0.7), guide = "none") +
+    geom_spatraster(data = dtm_sjer) +
     scale_fill_viridis_c() +
     guides(fill = guide_colorbar()) +
-    scale_alpha(range = c(0.4, 0.7), guide = "none") +
     theme_bw() +
-    theme(panel.grid.major = element_blank(), 
+    theme(panel.grid.major = element_blank(),
           panel.grid.minor = element_blank()) +
     theme(axis.title.x = element_blank(),
           axis.title.y = element_blank()) +
     ggtitle("DTM with Hillshade") +
-    coord_quickmap()
+    coord_sf()
 ```
 
-<img src="fig/07-raster-plot-rendered-challenge-hillshade-layering-2.png" alt="" style="display: block; margin: auto;" />
+``` output
+<SpatRaster> resampled to 500423 cells.
+<SpatRaster> resampled to 500423 cells.
+```
+
+``` error
+Error in `geom_spatraster()`:
+! Problem while computing aesthetics.
+ℹ Error occurred in the 1st layer.
+Caused by error:
+! object 'SJER_dtmHill' not found
+```
 
 :::::::::::::::::::::::::
 

@@ -296,8 +296,8 @@ in each raster. For this, we'll convert our data to long format:
 
 
 ``` r
-ndvi_harv_stack_df <- as.data.frame(ndvi_harv_stack, xy = TRUE) %>%
-    pivot_longer(-(x:y), names_to = "variable", values_to = "value")
+ndvi_harv_stack_df <- as.data.frame(ndvi_harv_stack) %>%
+    pivot_longer(everything(), names_to = "variable", values_to = "value")
 
 ggplot(ndvi_harv_stack_df) +
   geom_histogram(aes(value)) +
@@ -438,62 +438,14 @@ these two days explain the low NDVI values observed on these days?
 
 ## Answers
 
-First we need to load in the RGB data for Julian day 277 and look at its 
-metadata.
+We can plot the RGB data for Julian day 277.
 
 
 ``` r
 rgb_277 <- rast("data/NEON-DS-Landsat-NDVI/HARV/2011/RGB/277_HARV_landRGB.tif")
 
-# NOTE: Fix the bands' names so they don't start with a number!
-names(rgb_277) <- paste0("X", names(rgb_277))
-
-rgb_277
-```
-
-``` output
-class       : SpatRaster 
-size        : 652, 696, 3  (nrow, ncol, nlyr)
-resolution  : 30, 30  (x, y)
-extent      : 230775, 251655, 4704825, 4724385  (xmin, xmax, ymin, ymax)
-coord. ref. : WGS 84 / UTM zone 19N (EPSG:32619) 
-source      : 277_HARV_landRGB.tif 
-names       : X277_HARV_landRGB_1, X277_HARV_landRGB_2, X277_HARV_landRGB_3 
-min values  :                  26,                  29,                  79 
-max values  :                 255,                 255,                 255 
-```
-
-The RGB data has a max value of 255, but we need our color intensity to be 
-between 0 and 1, so we will divide our RasterStack object by 255.
-
-
-``` r
-rgb_277 <- rgb_277/255
-```
-
-Next we convert it to a dataframe.
-
-
-``` r
-rgb_277_df <- as.data.frame(rgb_277, xy = TRUE)
-```
-
-We create RGB colors from the three channels:
-
-
-``` r
-rgb_277_df$rgb <- 
-  with(rgb_277_df, rgb(X277_HARV_landRGB_1, X277_HARV_landRGB_2, 
-                       X277_HARV_landRGB_3, 1))
-```
-
-Finally, we can plot the RGB data for Julian day 277.
-
-
-``` r
-ggplot() +
-  geom_raster(data=rgb_277_df, aes(x, y), fill=rgb_277_df$rgb) + 
-  ggtitle("Julian day 277") 
+plotRGB(rgb_277, r = 1, g = 2, b = 3)
+title("Julian day 277")
 ```
 
 <img src="fig/12-time-series-raster-rendered-rgb-277-1.png" alt="" style="display: block; margin: auto;" />
@@ -504,15 +456,9 @@ We then do the same steps for Julian day 293
 ``` r
 # Julian day 293
 rgb_293 <- rast("data/NEON-DS-Landsat-NDVI/HARV/2011/RGB/293_HARV_landRGB.tif")
-names(rgb_293) <- paste0("X", names(rgb_293))
-rgb_293 <- rgb_293/255
-rgb_293_df <- as.data.frame(rgb_293, xy = TRUE)
-rgb_293_df$rgb <- 
-  with(rgb_293_df, rgb(X293_HARV_landRGB_1, X293_HARV_landRGB_2, 
-                       X293_HARV_landRGB_3,1))
-ggplot() +
-  geom_raster(data = rgb_293_df, aes(x, y), fill = rgb_293_df$rgb) +
-  ggtitle("Julian day 293")
+
+plotRGB(rgb_293, r = 1, g = 2, b = 3)
+title("Julian day 293")
 ```
 
 <img src="fig/12-time-series-raster-rendered-rgb-293-1.png" alt="" style="display: block; margin: auto;" />
