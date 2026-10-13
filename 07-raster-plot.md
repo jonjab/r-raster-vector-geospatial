@@ -340,13 +340,7 @@ ggplot() +
 <SpatRaster> resampled to 500380 cells.
 ```
 
-``` error
-Error in `geom_spatraster()`:
-! Problem while computing aesthetics.
-ℹ Error occurred in the 1st layer.
-Caused by error:
-! object 'HARV_DSMhill' not found
-```
+<img src="fig/07-raster-plot-rendered-raster-hillshade-1.png" alt="" style="display: block; margin: auto;" />
 
 :::::::::::::::::::::::::::::::::::::::::  callout
 
@@ -383,13 +377,7 @@ ggplot() +
 <SpatRaster> resampled to 500380 cells.
 ```
 
-``` error
-Error in `geom_spatraster()`:
-! Problem while computing aesthetics.
-ℹ Error occurred in the 1st layer.
-Caused by error:
-! object 'HARV_DSMhill' not found
-```
+<img src="fig/07-raster-plot-rendered-overlay-hillshade-1.png" alt="" style="display: block; margin: auto;" />
 
 :::::::::::::::::::::::::::::::::::::::  challenge
 
@@ -445,13 +433,7 @@ ggplot() +
 <SpatRaster> resampled to 500423 cells.
 ```
 
-``` error
-Error in `geom_spatraster()`:
-! Problem while computing aesthetics.
-ℹ Error occurred in the 1st layer.
-Caused by error:
-! object 'SJER_dsmHill' not found
-```
+<img src="fig/07-raster-plot-rendered-challenge-hillshade-layering-1.png" alt="" style="display: block; margin: auto;" />
 
 ``` r
 # CREATE DTM MAP
@@ -483,13 +465,7 @@ ggplot() +
 <SpatRaster> resampled to 500423 cells.
 ```
 
-``` error
-Error in `geom_spatraster()`:
-! Problem while computing aesthetics.
-ℹ Error occurred in the 1st layer.
-Caused by error:
-! object 'SJER_dtmHill' not found
-```
+<img src="fig/07-raster-plot-rendered-challenge-hillshade-layering-2.png" alt="" style="display: block; margin: auto;" />
 
 :::::::::::::::::::::::::
 

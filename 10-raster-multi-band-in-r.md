@@ -72,13 +72,7 @@ ggplot() +
 <SpatRaster> resampled to 500410 cells.
 ```
 
-``` error
-Error in `geom_spatraster()`:
-! Problem while computing aesthetics.
-ℹ Error occurred in the 1st layer.
-Caused by error:
-! object 'HARV_RGB_Ortho_1' not found
-```
+<img src="fig/10-raster-multi-band-in-r-rendered-harv-rgb-band1-1.png" alt="" style="display: block; margin: auto;" />
 
 To import the green band, we would use `lyrs = 2`.
 
@@ -226,15 +220,14 @@ ggplot() +
 
 ``` output
 <SpatRaster> resampled to 500410 cells.
+! `tidyterra::geom_spatraster()`: Plotting 3 overlapping layers: HARV_RGB_Ortho_1, HARV_RGB_Ortho_2, and HARV_RGB_Ortho_3. Either:
+
+• Use `facet_wrap(~lyr)` to facet layers.
+
+• Use `aes(fill = <name_of_layer>)` to display a single layer.
 ```
 
-``` error
-Error in `geom_spatraster()`:
-! Problem while computing aesthetics.
-ℹ Error occurred in the 1st layer.
-Caused by error:
-! object 'HARV_RGB_Ortho_2' not found
-```
+<img src="fig/10-raster-multi-band-in-r-rendered-rgb-harv-plot-band2-1.png" alt="" style="display: block; margin: auto;" />
 
 We can access any individual band in the same way.
 
@@ -750,21 +743,21 @@ methods(class=class(rgb_stack_harv))
 [313] tidy                  tighten               time                 
 [316] time<-                timeInfo              toMemory             
 [319] trans                 transmute             trim                 
-[322] unique                units                 units<-              
-[325] update                values                values<-             
-[328] varnames              varnames<-            viewshed             
-[331] watershed             weighted.mean         where.max            
-[334] where.min             which.lyr             which.max            
-[337] which.min             window                window<-             
-[340] wrap                  wrapCache             writeCDF             
-[343] writeRaster           writeStart            writeStop            
-[346] writeValues           xapp                  xFromCell            
-[349] xFromCol              xmax                  xmax<-               
-[352] xmin                  xmin<-                xres                 
-[355] xyFromCell            yFromCell             yFromRow             
-[358] ymax                  ymax<-                ymin                 
-[361] ymin<-                yres                  zonal                
-[364] zoom                 
+[322] unique                unite                 units                
+[325] units<-               update                values               
+[328] values<-              varnames              varnames<-           
+[331] viewshed              watershed             weighted.mean        
+[334] where.max             where.min             which.lyr            
+[337] which.max             which.min             window               
+[340] window<-              wrap                  wrapCache            
+[343] writeCDF              writeRaster           writeStart           
+[346] writeStop             writeValues           xapp                 
+[349] xFromCell             xFromCol              xmax                 
+[352] xmax<-                xmin                  xmin<-               
+[355] xres                  xyFromCell            yFromCell            
+[358] yFromRow              ymax                  ymax<-               
+[361] ymin                  ymin<-                yres                 
+[364] zonal                 zoom                 
 see '?methods' for accessing help and source code
 ```
 
@@ -883,21 +876,21 @@ methods(class=class(rgb_stack_harv[[1]]))
 [313] tidy                  tighten               time                 
 [316] time<-                timeInfo              toMemory             
 [319] trans                 transmute             trim                 
-[322] unique                units                 units<-              
-[325] update                values                values<-             
-[328] varnames              varnames<-            viewshed             
-[331] watershed             weighted.mean         where.max            
-[334] where.min             which.lyr             which.max            
-[337] which.min             window                window<-             
-[340] wrap                  wrapCache             writeCDF             
-[343] writeRaster           writeStart            writeStop            
-[346] writeValues           xapp                  xFromCell            
-[349] xFromCol              xmax                  xmax<-               
-[352] xmin                  xmin<-                xres                 
-[355] xyFromCell            yFromCell             yFromRow             
-[358] ymax                  ymax<-                ymin                 
-[361] ymin<-                yres                  zonal                
-[364] zoom                 
+[322] unique                unite                 units                
+[325] units<-               update                values               
+[328] values<-              varnames              varnames<-           
+[331] viewshed              watershed             weighted.mean        
+[334] where.max             where.min             which.lyr            
+[337] which.max             which.min             window               
+[340] window<-              wrap                  wrapCache            
+[343] writeCDF              writeRaster           writeStart           
+[346] writeStop             writeValues           xapp                 
+[349] xFromCell             xFromCol              xmax                 
+[352] xmax<-                xmin                  xmin<-               
+[355] xres                  xyFromCell            yFromCell            
+[358] yFromRow              ymax                  ymax<-               
+[361] ymin                  ymin<-                yres                 
+[364] zonal                 zoom                 
 see '?methods' for accessing help and source code
 ```
 

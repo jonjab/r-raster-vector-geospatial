@@ -93,13 +93,7 @@ ggplot() +
 <SpatRaster> resampled to 500380 cells.
 ```
 
-``` error
-Error in `geom_spatraster()`:
-! Problem while computing aesthetics.
-ℹ Error occurred in the 1st layer.
-Caused by error:
-! object 'HARV_DTMhill_WGS84' not found
-```
+<img src="fig/08-raster-reproject-in-r-rendered-unnamed-chunk-1-1.png" alt="" style="display: block; margin: auto;" />
 
 Our results are curious - neither the Digital Terrain Model (`dtm_harv`)
 nor the DTM Hillshade (`dtm_hill_harv`) plotted.
@@ -135,13 +129,7 @@ ggplot() +
 <SpatRaster> resampled to 500760 cells.
 ```
 
-``` error
-Error in `geom_spatraster()`:
-! Problem while computing aesthetics.
-ℹ Error occurred in the 1st layer.
-Caused by error:
-! object 'HARV_DTMhill_WGS84' not found
-```
+<img src="fig/08-raster-reproject-in-r-rendered-plot-DTM-hill-1.png" alt="" style="display: block; margin: auto;" />
 
 If we look at the axes, we can see that the projections of the two rasters are 
 different.
@@ -476,13 +464,7 @@ ggplot() +
 <SpatRaster> resampled to 500380 cells.
 ```
 
-``` error
-Error in `geom_spatraster()`:
-! Problem while computing aesthetics.
-ℹ Error occurred in the 1st layer.
-Caused by error:
-! object 'HARV_DTMhill_WGS84' not found
-```
+<img src="fig/08-raster-reproject-in-r-rendered-plot-projected-raster-1.png" alt="" style="display: block; margin: auto;" />
 
 We have now successfully draped the Digital Terrain Model on top of our
 hillshade to produce a nice looking, textured map!
@@ -528,13 +510,7 @@ ggplot() +
 <SpatRaster> resampled to 500423 cells.
 ```
 
-``` error
-Error in `geom_spatraster()`:
-! Problem while computing aesthetics.
-ℹ Error occurred in the 1st layer.
-Caused by error:
-! object 'SJER_DSMhill_WGS84' not found
-```
+<img src="fig/08-raster-reproject-in-r-rendered-challenge-code-reprojection-1.png" alt="" style="display: block; margin: auto;" />
 
 :::::::::::::::::::::::::
 
